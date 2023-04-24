@@ -32,17 +32,18 @@ export default class PostsController {
             const projectName = req.body.projectName
             const description = req.body.description
             const creatorUserID = req.body.creatorUserID
+            const contact = req.body.contact
             const ratings = req.body.ratings
             const tags = req.body.tags
             const technologies = req.body.technologies
             const images = req.body.images
             const isArchived = req.body.isArchived
 
-            if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined || images === undefined) {
+            if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined || images === undefined || contact === undefined) {
                 throw new Error("One or more required fields returned undefined. Refer to documentation to see required fields")
             }
 
-            const reviewResponse = await PostsDAO.addProject(projectName, description, creatorUserID, ratings, tags, technologies, images, isArchived)
+            const reviewResponse = await PostsDAO.addProject(projectName, description, creatorUserID, contact, ratings, tags, technologies, images, isArchived)
 
             if (reviewResponse.error) {
                 throw new Error(reviewResponse.error)

@@ -83,11 +83,11 @@ export default class PostsDAO {
         }
     }
     
-    static async addProject(projectName, description, creatorUserID, ratings, tags, technologies, images, isArchived) {
+    static async addProject(projectName, description, creatorUserID, contact, ratings, tags, technologies, images, isArchived) {
         try {
-            const PostStruct = new makeStruct(["projectName", "description", "creatorUserID", "ratings", "tags", "technologies", "images", "isArchived"])
+            const PostStruct = new makeStruct(["projectName", "description", "creatorUserID", "contact", "ratings", "tags", "technologies", "images", "isArchived"])
             
-            const createdProj = new PostStruct(projectName, description, creatorUserID, ratings, tags, technologies, images, isArchived)
+            const createdProj = new PostStruct(projectName, description, creatorUserID, contact, ratings, tags, technologies, images, isArchived)
             
             const insertRequest = await posts.insertOne(createdProj)
 
