@@ -50,12 +50,11 @@ export default class PostsDAO {
         let userQuery
 
         if(filters) {
-            // console.log("ID: " + filters["id"])
             if("id" in filters) {
                 if ("id" == "undefined" || "id" == null) {
                     throw new Error("ID is undefined or null")
                 }
-                // console.log("ID: " + filters["id"])
+
                 const filterID = new ObjectId(filters["id"])
                 userQuery = { "_id": filterID }
             }

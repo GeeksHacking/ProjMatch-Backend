@@ -7,7 +7,6 @@ export default class PostsController {
 
         let filters = {}
         if (req.query.id) {
-            // console.log("ID: " + req.query.id)
             filters.id = req.query.id
         }
 

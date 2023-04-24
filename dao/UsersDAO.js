@@ -80,7 +80,7 @@ export default class UsersDAO {
                 userQuery = { "regEmail": { $eq: filters["email"] } }
             } else if ("ph" in filters) {
                 userQuery = { "regPhone": {$eq: filters["ph"]} }
-            } else if (req.query.id) {
+            } else if ("id" in filters) {
                 userQuery = { "_id": new ObjectID(filters["id"]) }
             }
         }
