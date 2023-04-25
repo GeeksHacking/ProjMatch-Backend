@@ -71,39 +71,46 @@ export default class UsersDAO {
         page = 0,
         usersPerPage = 100
     } = {}) {
-        let userQuery
+        try {
+            let userQuery
 
-        if(filters) {
-            if("user" in filters) {
-                userQuery = { "username": { $eq: filters["user"] } }
-            } else if ("email" in filters) {
-                userQuery = { "regEmail": { $eq: filters["email"] } }
-            } else if ("ph" in filters) {
-                userQuery = { "regPhone": {$eq: filters["ph"]} }
-            } else if ("id" in filters) {
-                userQuery = { "_id": new ObjectID(filters["id"]) }
+            if(filters) {
+                if("user" in filters) {
+                    userQuery = { "username": { $eq: filters["user"] } }
+                } else if ("email" in filters) {
+                    userQuery = { "regEmail": { $eq: filters["email"] } }
+                } else if ("ph" in filters) {
+                    userQuery = { "regPhone": {$eq: filters["ph"]} }
+                } else if ("id" in filters) {
+                    userQuery = { "_id": new ObjectID(filters["id"]) }
+                }
             }
-        }
 
-        let cursor
-        try {
-            cursor = await users
-                .find(userQuery)
+            if (filters["id"] !== undefined) {
+                if (filters["id"].length > 24) {
+                    throw new Error("ID passed into filter is not valid")
+                }
+            }
+
+            let cursor
+            try {
+                cursor = await users
+                    .find(userQuery)
+            } catch (err) {
+                throw new Error(`Unable to find users with: ${err}`)
+            }
+
+            const displayCursor = cursor.limit(usersPerPage).skip(usersPerPage * page)
+            try {
+                const usersList = await displayCursor.toArray()
+                const totalUsers = await users.countDocuments(userQuery)
+
+                return { usersList, totalUsers }
+            } catch (err) {
+                throw new Error(`Unable to convert cursor to array, or a problem occured when counting documents: ${err}`)
+            }
         } catch (err) {
-            console.error(`Unable to find users with: ${err}`)
-            return { usersList: [], totalUsers: 0 }
-        }
 
-        const displayCursor = cursor.limit(usersPerPage).skip(usersPerPage * page)
-        try {
-            const usersList = await displayCursor.toArray()
-            const totalUsers = await users.countDocuments(userQuery)
-
-            return { usersList, totalUsers }
-        } catch (err) {
-            console.error(`Unable to convert cursor to array, or a problem occured when counting documents: ${err}`)
-            
-            return { usersList: [], totalUsers: 0 }
         }
     }
 

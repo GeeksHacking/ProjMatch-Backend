@@ -2,34 +2,38 @@ import UsersDAO from "../../dao/UsersDAO.js"
 
 export default class UsersController {
     static async apiGetUsers(req, res, next) {
-        const usersPerPage = req.query.usersPerPage ? parseInt(req.query.usersPerPage, 10) : 1000
-        const page = req.query.page ? parseInt(req.query.page, 10) : 0
+        try {
+            const usersPerPage = req.query.usersPerPage ? parseInt(req.query.usersPerPage, 10) : 1000
+            const page = req.query.page ? parseInt(req.query.page, 10) : 0
 
-        let filters = {}
-        if (req.query.user) {
-            filters.user = req.query.user
-        } else if (req.query.email) {
-            filters.email = req.query.email
-        } else if (req.query.ph) {
-            filters.ph = req.query.ph
-        } else if (req.query.id) {
-            filters.id = req.query.id
+            let filters = {}
+            if (req.query.user) {
+                filters.user = req.query.user
+            } else if (req.query.email) {
+                filters.email = req.query.email
+            } else if (req.query.ph) {
+                filters.ph = req.query.ph
+            } else if (req.query.id) {
+                filters.id = req.query.id
+            }
+
+            const { usersList, totalUsers } = await UsersDAO.getUsers({
+                filters,
+                page,
+                usersPerPage
+            })
+
+            let response = {
+                users: usersList,
+                page: page,
+                filters: filters,
+                usersPerPage: usersPerPage,
+                totalUsers: totalUsers
+            }
+            res.json(response)
+        } catch (err) {
+            res.status(500).json({ error: err.message })
         }
-
-        const { usersList, totalUsers } = await UsersDAO.getUsers({
-            filters,
-            page,
-            usersPerPage
-        })
-
-        let response = {
-            users: usersList,
-            page: page,
-            filters: filters,
-            usersPerPage: usersPerPage,
-            totalUsers: totalUsers
-        }
-        res.json(response)
     }
 
     static async apiPostUsers(req, res, next) {

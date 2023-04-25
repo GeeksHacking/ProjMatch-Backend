@@ -23,6 +23,8 @@ export default class PostsController {
             postsPerPage: postsPerPage,
             totalPosts: totalPosts
         }
+
+        console.log(response)
         res.json(response)
     }
 
