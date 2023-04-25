@@ -8,6 +8,8 @@ export default class PostsController {
         let filters = {}
         if (req.query.id) {
             filters.id = req.query.id
+        } else if (req.query.userID) {
+            filters.userID = req.query.userID
         }
 
         const { postsList, totalPosts } = await PostsDAO.getPosts({
@@ -24,7 +26,6 @@ export default class PostsController {
             totalPosts: totalPosts
         }
 
-        console.log(response)
         res.json(response)
     }
 

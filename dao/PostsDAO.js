@@ -57,6 +57,8 @@ export default class PostsDAO {
 
                 const filterID = new ObjectId(filters["id"])
                 userQuery = { "_id": filterID }
+            } else if ("userID" in filters) {
+                userQuery = { "creatorUserID": { $eq: filters["userID"] } }
             }
         }
 
