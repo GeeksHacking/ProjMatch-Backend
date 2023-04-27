@@ -11,6 +11,9 @@ export default class PostsController {
         } else if (req.query.userID) {
             filters.userID = req.query.userID
         }
+        else if (req.query.search) {
+            filters.search = req.query.search
+        }
 
         const { postsList, totalPosts } = await PostsDAO.getPosts({
             filters,

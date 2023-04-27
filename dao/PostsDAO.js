@@ -60,6 +60,9 @@ export default class PostsDAO {
             } else if ("userID" in filters) {
                 userQuery = { "creatorUserID": { $eq: filters["userID"] } }
             }
+            else if ("search" in filters) {
+                userQuery = { "projectName": { $regex: filters["search"], $options: "i" } }
+            }
         }
 
         let cursor
