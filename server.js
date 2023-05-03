@@ -6,6 +6,8 @@ import { auth } from "express-oauth2-jwt-bearer"
 import users from "./api/v1/users.route.js"
 import images from "./api/v1/images.route.js"
 import posts from "./api/v1/posts.route.js"
+import email from "./api/v1/email.js"
+
 
 dotenv.config()
 
@@ -24,7 +26,7 @@ app.use(cors({
     methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
 }))
 app.use(express.json())
-
+app.use("/api/v1/email", email)
 app.use("/api/v1/users", users)
 app.use("/api/v1/images", images)
 app.use("/api/v1/posts", posts)
