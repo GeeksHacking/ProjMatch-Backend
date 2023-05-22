@@ -11,13 +11,13 @@ dotenv.config()
 
 // Server Setup
 const app = express()
-// const jwtCheck = auth({
-//     audience: 'projmatchAPI',
-//     issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
-//     tokenSigningAlg: "RS256"
-// })
+const jwtCheck = auth({
+    audience: 'projmatchAPI',
+    issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+    tokenSigningAlg: "RS256"
+})
 
-// app.use(jwtCheck)
+app.use(jwtCheck)
 app.use(cors({
     origin: '*',
     optionsSuccessStatus: 200,
