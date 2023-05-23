@@ -12,9 +12,11 @@ dotenv.config()
 // Server Setup
 const app = express()
 const jwtCheck = auth({
-    audience: 'projmatchAPI',
+    audience: process.env.AUTH0_AUDIENCE,
     issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
-    tokenSigningAlg: "RS256"
+    clientID: process.env.AUTH0_CLIENT_ID,
+    secret: process.env.AUTH0_CLIENT_SECRET,
+    tokenSigningAlg: "RS256",
 })
 
 app.use(jwtCheck)
