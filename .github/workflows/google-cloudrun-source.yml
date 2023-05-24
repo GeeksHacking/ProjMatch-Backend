@@ -66,9 +66,7 @@ jobs:
     steps:
       - name: "Create ENV file"
         run: |
-          touch .env
           echo ${{ secrets.BACKEND_ENV }} >> .env
-          cat .env
     
       - name: Checkout
         uses: actions/checkout@v2
