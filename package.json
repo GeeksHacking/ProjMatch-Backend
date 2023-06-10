@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "deploy": "docker build -t gcr.io/projmatch/projmatch-api . ; docker push gcr.io/projmatch/projmatch-api"
   },
   "author": "",
   "license": "ISC",
