@@ -13,10 +13,7 @@ dotenv.config()
 const app = express()
 const jwtCheck = auth({
     audience: process.env.AUTH0_AUDIENCE,
-    issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
-    clientID: process.env.AUTH0_CLIENT_ID,
-    secret: process.env.AUTH0_CLIENT_SECRET,
-    tokenSigningAlg: "HS256",
+    issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL
 })
 const corsOptions = {
     origin: "https://projmatch.geekshacking.com"
@@ -25,7 +22,6 @@ const corsOptions = {
 app.use(cors(corsOptions))
 app.use(express.json())
 
-app.get("/healthz", (_, res) => res.status(200).json({ok: true}))
 
 app.use("/api/v1/users", jwtCheck, users)
 app.use("/api/v1/images", jwtCheck, images)
