@@ -1,4 +1,4 @@
-name: publish
+name: Deploy to Cloud Run
 
 on: [push]
 
@@ -13,7 +13,9 @@ jobs:
           echo "${{ secrets.BACKEND_ENV }}" >> .env
 
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v3
+        with:
+           path: main
 
       - name: Setup GCP Service Account
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@main
