@@ -1,0 +1,45 @@
+name: Deploy to Cloud Run
+
+on:
+   push:
+      branches: [ main ]
+
+jobs:
+  deploy:
+    name: Cloud Run Deployment
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: "Create ENV file"
+        run: |
+          echo "${{ secrets.BACKEND_ENV }}" >> .env
+
+      - name: Setup GCP Service Account
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@main
+        with:
+          version: 'latest'
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker --quiet
+        
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Build
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/api:latest .
+
+      - name: Push
+        run: |
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/api:latest
+
+      - name: Deploy
+        run: |
+          gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} \
+          --region asia-east1 \
+          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/api \
+          --platform managed \
+          --allow-unauthenticated
