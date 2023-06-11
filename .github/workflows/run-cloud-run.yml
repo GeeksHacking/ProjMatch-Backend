@@ -12,11 +12,6 @@ jobs:
         run: |
           echo "${{ secrets.BACKEND_ENV }}" >> .env
 
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-           path: main
-
       - name: Setup GCP Service Account
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@main
         with:
@@ -28,6 +23,11 @@ jobs:
       - name: Configure Docker
         run: |
           gcloud auth configure-docker
+        
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+           path: main
       
       - name: Build
         run: |
