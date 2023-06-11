@@ -30,6 +30,7 @@ jobs:
       
       - name: Build
         run: |
+          echo test &&
           docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/api:latest .
 
       - name: Push
