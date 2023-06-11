@@ -1,9 +1,11 @@
 name: Deploy to Cloud Run
 
-on: [push]
+on:
+   push:
+      branches: [ main ]
 
 jobs:
-  build:
+  deploy:
     name: Cloud Run Deployment
     runs-on: ubuntu-latest
     steps:
@@ -18,16 +20,13 @@ jobs:
           version: 'latest'
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
 
       - name: Configure Docker
         run: |
-          gcloud auth configure-docker
+          gcloud auth configure-docker --quiet
         
       - name: Checkout Repository
         uses: actions/checkout@v3
-        with:
-           path: main
       
       - name: Build
         run: |
@@ -39,9 +38,8 @@ jobs:
 
       - name: Deploy
         run: |
-          gcloud run deploy helloworld \
+          gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} \
           --region asia-east1 \
           --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/api \
           --platform managed \
-          --allow-unauthenticated \
-          --project ${{ secrets.GCP_PROJECT_ID }}
+          --allow-unauthenticated
