@@ -1,4 +1,4 @@
-name: Docker
+name: Cloud Run Deployment
 
 on:
   push:
@@ -30,10 +30,10 @@ jobs:
           uses: actions/checkout@v2
 
         - name: Build Docker image
-          run: docker build . -t $IMAGE_NAME
+          run: docker build . -t projmatch-main
 
         - name: Push Docker image
-          run: docker push $IMAGE_NAME
+          run: docker push projmatch-main
 
         - name: Deploy Docker image
-          run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image $IMAGE_NAME --region us-central1 --platform managed
+          run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image projmatch-main --region asia-east1 --platform managed
