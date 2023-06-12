@@ -15,13 +15,20 @@ const jwtCheck = auth({
     audience: process.env.AUTH0_AUDIENCE,
     issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL
 })
-const corsOptions = {
-    origin: "https://projmatch.geekshacking.com"
+const allowedOrigin = ["https://projmatch.geekshacking.com", "http://localhost:3000"]
+var corsOptionsDelegate = function (req, callback) {
+    var corsOptions;
+    if (allowedOrigin.indexOf(req.header('Origin')) !== -1) {
+      corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+    } else {
+      corsOptions = { origin: false } // disable CORS for this request
+    }
+    callback(null, corsOptions) // callback expects two parameters: error and options
 }
 
-app.use(cors(corsOptions))
+app.options("*", cors(corsOptionsDelegate))
+app.use(cors(corsOptionsDelegate))
 app.use(express.json())
-
 
 app.use("/api/v1/users", jwtCheck, users)
 app.use("/api/v1/images", jwtCheck, images)

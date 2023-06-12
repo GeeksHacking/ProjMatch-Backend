@@ -1,45 +1,44 @@
-name: Deploy to Cloud Run
+name: Cloud Run Deployment
 
 on:
-   push:
-      branches: [ main ]
+  push:
+    branches: [ main ]
 
 jobs:
-  deploy:
-    name: Cloud Run Deployment
-    runs-on: ubuntu-latest
-    steps:
-    
-      - name: "Create ENV file"
-        run: |
-          echo "${{ secrets.BACKEND_ENV }}" >> .env
 
-      - name: Setup GCP Service Account
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@main
-        with:
-          version: 'latest'
-          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+    deploy:
 
-      - name: Configure Docker
-        run: |
-          gcloud auth configure-docker --quiet
+        name: Deployment
+        runs-on: ubuntu-latest
+        env:
+          IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}
+        steps:
+
+        - name: Login
+          uses: google-github-actions/setup-gcloud@v0
+          with:
+            project_id: ${{ secrets.GCP_PROJECT_ID }}
+            service_account_email: ${{ secrets.GCP_EMAIL }}
+            service_account_key: ${{ secrets.GCP_CREDENTIALS }}
         
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-      
-      - name: Build
-        run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/api:latest .
+        - name: Configure Project
+          run: gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Push
-        run: |
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/api:latest
+        - name: Configure Docker
+          run: gcloud auth configure-docker --quiet
 
-      - name: Deploy
-        run: |
-          gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} \
-          --region asia-east1 \
-          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/api \
-          --platform managed \
-          --allow-unauthenticated
+        - name: Checkout repository
+          uses: actions/checkout@v2
+
+        - name: Inject .env File
+          run: |
+            echo "${{ secrets.BACKEND_ENV }}" >> .env
+
+        - name: Build Docker image
+          run: docker build . -t ${{ secrets.GCR_REPO }}
+
+        - name: Push Docker image
+          run: docker push ${{ secrets.GCR_REPO }}
+
+        - name: Deploy Docker image
+          run: gcloud run deploy projmatchapi --image ${{ secrets.GCR_REPO }} --region asia-east1 --platform managed
