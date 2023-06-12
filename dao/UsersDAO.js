@@ -1,5 +1,6 @@
 import { query } from "express"
-import mongodb from "mongodb"
+const mongodb = require("mongodb")
+
 const ObjectID = mongodb.ObjectId
 
 let users
