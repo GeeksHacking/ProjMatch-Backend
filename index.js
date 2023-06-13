@@ -1,6 +1,7 @@
 import app from "./server.js"
 import dotenv from "dotenv"
 const mongodb = require('mongodb')
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
 // DAO
 import UsersDAO from "./dao/UsersDAO.js"
@@ -10,10 +11,16 @@ dotenv.config()
 const MongoClient = mongodb.MongoClient
 
 const port = process.env.PORT || 8080
+let mongod;
 
 ;(async () => {
     try {
-        const client = await MongoClient.connect(process.env.ATLAS_URI, { useNewUrlParser: true })
+        let dbUrl = process.env.ATLAS_URI
+        if (process.env.NODE_ENV === 'test') {
+            mongod = await MongoMemoryServer.create();
+            dbUrl = mongod.getUri();
+        }
+        const client = await MongoClient.connect(dbUrl, { useNewUrlParser: true })
         await UsersDAO.injectDB(client)
         await PostsDAO.injectDB(client)
 
