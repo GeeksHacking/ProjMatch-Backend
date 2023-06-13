@@ -6,6 +6,17 @@ const dotenv = require("dotenv")
 dotenv.config("../.env")
 const api = supertest(app)
 
+// Sample Data
+const sampleProject = {
+    "projectName": "Sample Project",
+    "description": "This just a test wow",
+    "creatorUserID": "SOMEUSERID",
+    "contact": "discord.gg/idkdoesthisexist",
+    "tags": ["tag1", "tag2"],
+    "technologies": ["tech1", "tech2"],
+    "images": "no",
+}
+
 describe("GET /api/v1/posts", () => {
     test("Send an unauthenticated request", async () => {
         await api.get("/api/v1/posts").expect(401)
