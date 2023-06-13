@@ -17,9 +17,11 @@ const port = process.env.PORT || 8080
         await UsersDAO.injectDB(client)
         await PostsDAO.injectDB(client)
 
-        app.listen(port, () => {
-            console.log(`Server listening on port ${port}`)
-        })
+        if (process.env.NODE_ENV !== "test") {
+            app.listen(port, () => {
+                console.log(`Server listening on port ${port}`)
+            })
+        }
     }
     catch (err) {
         console.error(err.stack)
