@@ -19,11 +19,7 @@ describe("GET /api/v1/posts", () => {
                 throw new Error("Access token returned undefined")
             }
 
-            try {
-                await api.get("/api/v1/posts").set('Authorization', `Bearer ${accessToken}`).expect(200).expect('Content-Type', /application\/json/)
-            } catch (e) {
-                throw new Error(`Expected Status 200, got error with ${e}`)
-            }
+            await api.get("/api/v1/posts").set('Authorization', `Bearer ${accessToken}`).expect(200).expect('Content-Type', /application\/json/)
         })
     })
 })

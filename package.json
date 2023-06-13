@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --forceExit --config=./jest.config.cjs",
+    "test": "jest --config=./jest.config.cjs --silent=false --verbose",
     "start": "node index.js",
     "deploy": "docker build -t gcr.io/projmatch/projmatch-api . ; docker push gcr.io/projmatch/projmatch-api"
   },
