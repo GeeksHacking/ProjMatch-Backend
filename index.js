@@ -26,3 +26,5 @@ const port = process.env.PORT || 8080
         process.exit(1)
     }
 })()
+
+module.exports = app

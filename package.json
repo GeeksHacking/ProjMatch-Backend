@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --forceExit --config=./jest.config.cjs",
     "start": "node index.js",
     "deploy": "docker build -t gcr.io/projmatch/projmatch-api . ; docker push gcr.io/projmatch/projmatch-api"
   },
@@ -32,5 +32,8 @@
   "devDependencies": {
     "@babel/preset-env": "^7.22.5",
     "@shelf/jest-mongodb": "^2.1.0"
+  },
+  "jest": {
+    "globalSetup": "./__tests__/jest.setup.js"
   }
 }

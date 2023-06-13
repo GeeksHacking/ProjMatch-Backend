@@ -6,9 +6,9 @@ const dotenv = require("dotenv")
 dotenv.config("../.env")
 const api = supertest(app)
 
-describe("GET /api/v1/users", () => {
+describe("GET /api/v1/posts", () => {
     test("Send an unauthenticated request", async () => {
-        await api.get("/api/v1/users").expect(401)
+        await api.get("/api/v1/posts").expect(401)
     })
 
     describe("Test authenticated requests", () => {
@@ -19,7 +19,7 @@ describe("GET /api/v1/users", () => {
                 throw new Error("Access token returned undefined")
             }
 
-            await api.get("/api/v1/users").set('Authorization', `Bearer ${accessToken}`).expect(200).expect('Content-Type', /application\/json/)
+            await api.get("/api/v1/posts").set('Authorization', `Bearer ${accessToken}`).expect(200).expect('Content-Type', /application\/json/)
         })
     })
 })
