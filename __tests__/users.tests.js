@@ -114,6 +114,8 @@ describe("PUT /api/v1/users", () => {
             throw new Error("Sample User's UID is undefined")
         }
 
+        sampleUser.id = sampleUserUid
+
         const response = await api.put(`/api/v1/users`).set('Authorization', `Bearer ${accessToken}`).send(updateUser)
         expect(response.statusCode).toBe(200)
         expect(response.body.status).toBe("success")
@@ -130,6 +132,8 @@ describe("PUT /api/v1/users", () => {
         if (sampleUserUid === undefined) {
             throw new Error("Sample User's UID is undefined")
         }
+        
+        sampleUser.id = sampleUserUid
 
         const response = await api.get(`/api/v1/users?id=${sampleUserUid}`).set('Authorization', `Bearer ${accessToken}`)
         expect(response.statusCode).toBe(200)
