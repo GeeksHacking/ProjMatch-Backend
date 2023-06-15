@@ -1,5 +1,6 @@
 // Gets Access Token and passes it to all Test Suites
 const axios = require("axios")
+const fs = require('fs');
 require("dotenv").config()
 
 let token;
@@ -20,13 +21,14 @@ const getAccessToken = async () => {
     };
     
     await axios.request(apiOptions).then(function (res) {
-        token = res.data["access_token"]
+        global.accessToken = res.data["access_token"]
     }).catch(function (err) {
         console.error("Failed to get API Authentication Token with: ", err)
     })
 }
 
 module.exports = async () => {
-    await getAccessToken()
-    return token
+    if (!global.accessToken) {
+        await getAccessToken()
+    }
 }
