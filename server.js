@@ -13,23 +13,21 @@ dotenv.config()
 
 // Server Setup
 const app = express()
-// const jwtCheck = auth({
-//     audience: 'projmatchAPI',
-//     issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
-//     tokenSigningAlg: "RS256"
-// })
+const jwtCheck = auth({
+    audience: process.env.AUTH0_AUDIENCE,
+    issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL
+})
+const corsOptions = {
+    origin: "https://projmatch.geekshacking.com"
+}
 
-// app.use(jwtCheck)
-app.use(cors({
-    origin: '*',
-    optionsSuccessStatus: 200,
-    methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
-}))
+app.use(cors(corsOptions))
 app.use(express.json())
+
 app.use("/api/v1/email", email)
-app.use("/api/v1/users", users)
-app.use("/api/v1/images", images)
-app.use("/api/v1/posts", posts)
+app.use("/api/v1/users", jwtCheck, users)
+app.use("/api/v1/images", jwtCheck, images)
+app.use("/api/v1/posts", jwtCheck, posts)
 app.use("*", (req, res) => res.status(404).json({error: "Not Found"}))
 app.use((err, req, res, next) => {
     const status = err.status || 500
