@@ -1,7 +1,13 @@
 import { query } from "express"
 import mongodb from "mongodb"
-import { ObjectId } from "mongodb";
 
+let ObjectID
+if (process.env.NODE_ENV === 'test') {
+    const mongodb = require('mongodb')
+    ObjectID = mongodb.ObjectId
+} else {
+    ObjectID = mongodb.ObjectId
+}
 let posts
 
 /*
@@ -55,7 +61,7 @@ export default class PostsDAO {
                     throw new Error("ID is undefined or null")
                 }
 
-                const filterID = new ObjectId(filters["id"])
+                const filterID = new ObjectID(filters["id"])
                 userQuery = { "_id": filterID }
             } else if ("userID" in filters) {
                 userQuery = { "creatorUserID": { $eq: filters["userID"] } }
@@ -107,7 +113,7 @@ export default class PostsDAO {
 
     static async updateProject(id, update) {
         try {
-            const updateResponse = await posts.updateOne({"_id": new ObjectId(id)}, {$set: update})
+            const updateResponse = await posts.updateOne({"_id": new ObjectID(id)}, {$set: update})
 
             return updateResponse
         } catch (err) {
@@ -118,7 +124,7 @@ export default class PostsDAO {
     static async deleteProject(id) {
         try {
             const deleteResponse = await posts.deleteOne({
-                "_id": new ObjectId(id)
+                "_id": new ObjectID(id)
             })
 
             if (deleteResponse.deletedCount === 0) {
