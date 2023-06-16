@@ -65,7 +65,7 @@ export default class PostsDAO {
                     throw new Error("Invalid ID")
                 }
 
-                const filterID = new ObjectId(filters["id"])
+                const filterID = new ObjectID(filters["id"])
                 userQuery = { "_id": filterID }
             } else if ("userID" in filters) {
                 userQuery = { "creatorUserID": { $eq: filters["userID"] } }
