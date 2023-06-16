@@ -1,14 +1,22 @@
 import app from "./server.js"
 import dotenv from "dotenv"
-const mongodb = require('mongodb')
-const { MongoMemoryServer } = require('mongodb-memory-server');
+import mongodb from 'mongodb'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+
+let MongoClient
+if (process.env.NODE_ENV === 'test') {
+    const mongodb = require('mongodb')
+    const { MongoMemoryServer } = require('mongodb-memory-server')
+    MongoClient = mongodb.MongoClient
+} else {
+    MongoClient = mongodb.MongoClient
+}
 
 // DAO
 import UsersDAO from "./dao/UsersDAO.js"
 import PostsDAO from "./dao/PostsDAO.js"
 
 dotenv.config()
-const MongoClient = mongodb.MongoClient
 
 const port = process.env.PORT || 8080
 let mongod;
@@ -36,4 +44,6 @@ let mongod;
     }
 })()
 
-module.exports = app
+if (process.env.NODE_ENV === 'test') {
+    module.exports = app
+}

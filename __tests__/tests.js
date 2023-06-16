@@ -30,12 +30,13 @@ let sampleProjectUid;
 describe("Testing Users API", () => {
     describe("POST /api/v1/users", () => {
         test("Send an unauthenticated request", async () => {
-            await api.post("/api/v1/users").expect(401)
+            const response = await api.post("/api/v1/users")
+            expect(response.statusCode).toBe(401)
         })
     
         describe("Test authenticated requests", () => {
             test("Authenticated POST request", async () => {
-                 if (accessToken === undefined) {
+                if (accessToken === undefined) {
                     throw new Error("Access token returned undefined")
                 }
     
@@ -121,7 +122,7 @@ describe("Testing Users API", () => {
                 throw new Error("Sample User's UID is undefined")
             }
     
-            sampleUser.id = sampleUserUid
+            updateUser.id = sampleUserUid
     
             const response = await api.put(`/api/v1/users`).set('Authorization', `Bearer ${accessToken}`).send(updateUser)
             expect(response.statusCode).toBe(200)
