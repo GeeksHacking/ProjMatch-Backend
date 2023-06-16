@@ -55,6 +55,10 @@ export default class PostsDAO {
                     throw new Error("ID is undefined or null")
                 }
 
+                if (filters["id"].length != 12) {
+                    throw new Error("Invalid ID")
+                }
+
                 const filterID = new ObjectId(filters["id"])
                 userQuery = { "_id": filterID }
             } else if ("userID" in filters) {
