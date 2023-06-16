@@ -89,7 +89,11 @@ export default class UsersDAO {
                 } else if ("ph" in filters) {
                     userQuery = { "regPhone": {$eq: filters["ph"]} }
                 } else if ("id" in filters) {
-                    userQuery = { "_id": new ObjectID(filters["id"]) }
+                    if (filters["id"].length === 24) {
+                        userQuery = { "_id": new ObjectID(filters["id"]) }
+                    } else {
+                        throw new Error("Invalid ID")
+                    }
                 }
             }
 
@@ -117,7 +121,7 @@ export default class UsersDAO {
                 throw new Error(`Unable to convert cursor to array, or a problem occured when counting documents: ${err}`)
             }
         } catch (err) {
-
+            throw new Error(`An unknown error occured with ${err}`)
         }
     }
 
