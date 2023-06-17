@@ -33,6 +33,9 @@ jobs:
         - name: Inject .env File
           run: |
             echo "${{ secrets.BACKEND_ENV }}" >> .env
+            
+        - name: Install Dependencies
+          run: npm install
 
         - name: Build Docker image
           run: docker build . -t ${{ secrets.GCR_REPO }}
