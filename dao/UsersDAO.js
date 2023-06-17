@@ -1,6 +1,13 @@
 import { query } from "express"
 import mongodb from "mongodb"
-const ObjectID = mongodb.ObjectId
+
+let ObjectID
+if (process.env.NODE_ENV === 'test') {
+    const mongodb = require('mongodb')
+    ObjectID = mongodb.ObjectId
+} else {
+    ObjectID = mongodb.ObjectId
+}
 
 let users
 
