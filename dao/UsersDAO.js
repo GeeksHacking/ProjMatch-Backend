@@ -16,38 +16,14 @@ User Object:
 
 {
     "username": "",
-    "rlName": "",
-    "regEmail": "",
-    "regPhone": "",
-    "dateCreated": "",
-    "aboutMe": "",
-    "userDat": {
-        "rating": 0.0,
-        "skills": "",
-        "connectedAccounts": {
-
-        },
-        "createdProjects": {
-            "openProj": {
-
-            },
-            "closedProj": {
-
-            }
-        },
-        "location": "",
-        "preference": [],
-        "profilePic": "",
-        "profileBanner": ""
-    },
-    "settings": {
-        "web_settings": {
-            "theme": "light"
-        },
-        "privacy": {
-            "personalisation": false
-        }
-    }
+    "about": "",
+    "profileImg": "",
+    "bannerImg": "",
+    "contact": "",
+    "rating": 0.0,
+    "technologies": [],
+    "savedPosts": [],
+    "algoData": []
 }
 */
 
@@ -129,14 +105,9 @@ export default class UsersDAO {
         try {
 
             // User Structure
-            const UserStruct = new makeStruct(["username", "rlName", "regEmail", "regPhone", "dateCreated", "aboutMe", "userDat", "settings"])
-            const UserDatStruct = new makeStruct(["rating", "skills", "location", "preference", "connectedAccounts", "createdProjs", "profilePic", "profileBanner"])
-            const CreatedProjsStruct = new makeStruct(["openProj", "closedProj"])
-            const SettingsStruct = new makeStruct(["web_settings", "privacy"])
-            const WebSettingsStruct = new makeStruct(["theme"])
-            const PrivacyStruct = new makeStruct(["personalisation"])
+            const UserStruct = new makeStruct(["username", "about", "profileImg", "bannerImg", "contact", 0.0, [], [], []])
 
-            const userDoc = new UserStruct(username, rlName, regEmail, regPhone, new Date(), "Hi! I'm a new user of ProjMatch!", new UserDatStruct(0.0, [], "On Earth", [], [], new CreatedProjsStruct({}, {}), "", ""), new SettingsStruct(new WebSettingsStruct("light"), new PrivacyStruct(true)))
+            const userDoc = new UserStruct()
 
             return await users.insertOne(userDoc)
         } catch (err) {
