@@ -10,6 +10,10 @@ jobs:
       - name: Inject .env File
         run: |
           echo "${{ secrets.BACKEND_ENV }}" >> .env
+      
+      - name: Inject M2M Token
+        run: |
+          echo "${{ secrets.M2M_ENV }}" >> ./__tests__/.env.test
         
       - name: Setup Node.js
         uses: actions/setup-node@v3
