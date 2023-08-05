@@ -16,38 +16,14 @@ User Object:
 
 {
     "username": "",
-    "rlName": "",
-    "regEmail": "",
-    "regPhone": "",
-    "dateCreated": "",
-    "aboutMe": "",
-    "userDat": {
-        "rating": 0.0,
-        "skills": "",
-        "connectedAccounts": {
-
-        },
-        "createdProjects": {
-            "openProj": {
-
-            },
-            "closedProj": {
-
-            }
-        },
-        "location": "",
-        "preference": [],
-        "profilePic": "",
-        "profileBanner": ""
-    },
-    "settings": {
-        "web_settings": {
-            "theme": "light"
-        },
-        "privacy": {
-            "personalisation": false
-        }
-    }
+    "about": "",
+    "profileImg": "",
+    "bannerImg": "",
+    "contact": "",
+    "rating": 0.0,
+    "technologies": [],
+    "savedPosts": [],
+    "algoData": []
 }
 */
 
@@ -85,9 +61,7 @@ export default class UsersDAO {
                 if("user" in filters) {
                     userQuery = { "username": { $eq: filters["user"] } }
                 } else if ("email" in filters) {
-                    userQuery = { "regEmail": { $eq: filters["email"] } }
-                } else if ("ph" in filters) {
-                    userQuery = { "regPhone": {$eq: filters["ph"]} }
+                    userQuery = { "contact": { $eq: filters["email"] } }
                 } else if ("id" in filters) {
                     if (filters["id"].length === 24) {
                         userQuery = { "_id": new ObjectID(filters["id"]) }
@@ -125,18 +99,13 @@ export default class UsersDAO {
         }
     }
 
-    static async addUser(username, rlName, regEmail, regPhone) {
+    static async addUser(username, contact, about, algoData, skills) {
         try {
 
             // User Structure
-            const UserStruct = new makeStruct(["username", "rlName", "regEmail", "regPhone", "dateCreated", "aboutMe", "userDat", "settings"])
-            const UserDatStruct = new makeStruct(["rating", "skills", "location", "preference", "connectedAccounts", "createdProjs", "profilePic", "profileBanner"])
-            const CreatedProjsStruct = new makeStruct(["openProj", "closedProj"])
-            const SettingsStruct = new makeStruct(["web_settings", "privacy"])
-            const WebSettingsStruct = new makeStruct(["theme"])
-            const PrivacyStruct = new makeStruct(["personalisation"])
+            const UserStruct = new makeStruct(["username", "about", "profileImg", "bannerImg", "contact", "rating", "technologies", "savedPosts", "algoData"])
 
-            const userDoc = new UserStruct(username, rlName, regEmail, regPhone, new Date(), "Hi! I'm a new user of ProjMatch!", new UserDatStruct(0.0, [], "On Earth", [], [], new CreatedProjsStruct({}, {}), "", ""), new SettingsStruct(new WebSettingsStruct("light"), new PrivacyStruct(true)))
+            const userDoc = new UserStruct(username, about, "", "", contact, 0.0, skills, [], algoData)
 
             return await users.insertOne(userDoc)
         } catch (err) {

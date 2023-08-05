@@ -39,15 +39,16 @@ export default class UsersController {
     static async apiPostUsers(req, res, next) {
         try {
             const username = req.body.username
-            const rlName = req.body.rlName
-            const regEmail = req.body.regEmail
-            const regPhone = req.body.regPhone
+            const contact = req.body.contact
+            const about = req.body.about
+            const algoData = req.body.algoData
+            const skills = req.body.skills
 
-            if (username === undefined || rlName === undefined || regEmail === undefined || regPhone === undefined) {
+            if (username === undefined || contact === undefined || about === undefined || algoData === undefined) {
                 throw new Error("Arguments for Creating User is incomplete")
             }
 
-            const reviewRes = await UsersDAO.addUser(username, rlName, regEmail, regPhone)
+            const reviewRes = await UsersDAO.addUser(username, contact, about, algoData, skills)
 
             if (reviewRes.error) {
                 throw new Error(reviewRes.error)

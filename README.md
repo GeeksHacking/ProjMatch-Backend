@@ -26,25 +26,10 @@ To get more information about how to get the unique access token for the user an
 # Get User Details
 ## User Information Types
 1. username -- **Required for User Creation**
-2. rlName -- **Required for User Creation**
-3. regEmail -- **Required for User Creation**
-4. regPhone -- **Required for User Creation**
-5. dateCreated -- Auto-Generated on Creation
-6. aboutMe
-7. userDat _(Needs to be set by the user in profile settings later on)_  
-    1. rating _(Cannot be edited by user)_
-    2. skills
-    3. connectedAccounts
-    4. createdProjects
-    6. location
-    7. preference
-    8. profilePic
-    9. profileBanner
-8. settings
-    1. web_settings
-        1. theme
-    2. privacy
-        1. personalisation
+2. about -- **Required for User Creation**
+3. contact -- **Required for User Creation**
+4. skills -- **Required for User Creation**
+5. algoData
 ## API Requests
 Use `(domain)/api/v1/users` to communicate with the User API
 - Additional query can be appended to the URL to get certain information _(only applicable for GET requests)_
