@@ -10,9 +10,10 @@ const api = supertest(app)
 let sampleUserUid;
 const sampleUser = {
     "username": "Im a TESTTTT",
-    "rlName": "API Testing -- Mock User",
-    "regEmail": "test@test.com",
-    "regPhone": 0
+    "about": "API Testing -- Mock User",
+    "contact": "test@test.com",
+    "skills": ["none"],
+    "algoData": []
 }
 
 const sampleProject = {
@@ -82,7 +83,7 @@ describe("Testing Users API", () => {
     
                 const response = await api.get(`/api/v1/users?id=${sampleUserUid}`).set('Authorization', `Bearer ${accessToken}`)
                 expect(response.statusCode).toBe(200)
-                expect(response.body.users[0].regEmail).toContain(sampleUser["regEmail"])
+                expect(response.body.users[0].contact).toContain(sampleUser["contact"])
                 expect(response.body.users[0]._id).toContain(sampleUserUid)
             })
     
@@ -96,10 +97,10 @@ describe("Testing Users API", () => {
                     throw new Error("Sample User's UID is undefined")
                 }
     
-                const response = await api.get(`/api/v1/users?email=${sampleUser["regEmail"]}`).set('Authorization', `Bearer ${accessToken}`)
+                const response = await api.get(`/api/v1/users?email=${sampleUser["contact"]}`).set('Authorization', `Bearer ${accessToken}`)
                 expect(response.statusCode).toBe(200)
                 expect(response.body.users[0]._id).toContain(sampleUserUid)
-                expect(response.body.users[0].regEmail).toContain(sampleUser["regEmail"])
+                expect(response.body.users[0].contact).toContain(sampleUser["contact"])
             })
         })
     })
@@ -108,7 +109,7 @@ describe("Testing Users API", () => {
         const updateUser = {
             "id": sampleUserUid,
             "update": {
-                "regPhone": 12345678
+                "contact": "hello@hello.com"
             }
         }
     
@@ -142,7 +143,7 @@ describe("Testing Users API", () => {
     
             const response = await api.get(`/api/v1/users?id=${sampleUserUid}`).set('Authorization', `Bearer ${accessToken}`)
             expect(response.statusCode).toBe(200)
-            expect(response.body.users[0].regPhone).toEqual(updateUser["update"]["regPhone"])
+            expect(response.body.users[0].contact).toEqual(updateUser["update"]["contact"])
         })
     })
     

@@ -61,9 +61,7 @@ export default class UsersDAO {
                 if("user" in filters) {
                     userQuery = { "username": { $eq: filters["user"] } }
                 } else if ("email" in filters) {
-                    userQuery = { "regEmail": { $eq: filters["email"] } }
-                } else if ("ph" in filters) {
-                    userQuery = { "regPhone": {$eq: filters["ph"]} }
+                    userQuery = { "contact": { $eq: filters["email"] } }
                 } else if ("id" in filters) {
                     if (filters["id"].length === 24) {
                         userQuery = { "_id": new ObjectID(filters["id"]) }
@@ -101,13 +99,13 @@ export default class UsersDAO {
         }
     }
 
-    static async addUser(username, rlName, regEmail, regPhone) {
+    static async addUser(username, contact, about, algoData, skills) {
         try {
 
             // User Structure
-            const UserStruct = new makeStruct(["username", "about", "profileImg", "bannerImg", "contact", 0.0, [], [], []])
+            const UserStruct = new makeStruct(["username", "about", "profileImg", "bannerImg", "contact", "rating", "technologies", "savedPosts", "algoData"])
 
-            const userDoc = new UserStruct()
+            const userDoc = new UserStruct(username, about, "", "", contact, 0.0, skills, [], algoData)
 
             return await users.insertOne(userDoc)
         } catch (err) {
