@@ -6,6 +6,7 @@ import { auth } from "express-oauth2-jwt-bearer"
 import users from "./api/v1/users.route.js"
 import images from "./api/v1/images.route.js"
 import posts from "./api/v1/posts.route.js"
+import authToken from "./api/v1/authtoken.route.js"
 
 dotenv.config()
 
@@ -33,6 +34,7 @@ app.use(express.json())
 app.use("/api/v1/users", jwtCheck, users)
 app.use("/api/v1/images", jwtCheck, images)
 app.use("/api/v1/posts", jwtCheck, posts)
+app.use("/api/v1/authtoken", jwtCheck, authToken)
 app.use("*", (req, res) => res.status(404).json({error: "Not Found"}))
 app.use((err, req, res, next) => {
     const status = err.status || 500
