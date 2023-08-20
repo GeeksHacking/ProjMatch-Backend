@@ -1,7 +1,7 @@
 import express from "express"
-import AuthTokenController from "./authtoken.controller"
+import AuthTokenController from "./authtoken.controller.js"
 
-router = express.Router()
+const router = express.Router()
 
 router.route("/")
     .get(AuthTokenController.getAuthToken)
