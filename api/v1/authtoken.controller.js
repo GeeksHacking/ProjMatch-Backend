@@ -19,27 +19,24 @@ export default class AuthTokenController {
                     data: new URLSearchParams({
                         grant_type: "authorization_code",
                         client_id: process.env.AUTH0_CLIENT_ID,
-                        client_secret: process.env.OAUTH_CLIENT_SECRET,
+                        client_secret: process.env.AUTH0_CLIENT_SECRET,
                         audience: process.env.AUTH0_AUDIENCE,
                         code: accessToken,
                         redirect_uri: `${process.env.AUTH0_BASE_URL}/Load`,
                     }),
                 };
 
-                axios
-                    .request(apiOptions)
-                    .then(function (res) {
-                        const responseBody = res.data;
-                        
-                        return responseBody["access_token"]
-                    })
-                    .catch(function (err) {
-                        console.error("Failed to get API Authentication Token with: ", err);
-                    });
+                try {
+                    const response = await axios.request(apiOptions)
+
+                    const accessToken = response.data["access_token"]
+                    return accessToken
+                } catch (err) {
+                    console.error("Failed to get API Authentication Token with: ", err);
+                }
             }
 
             const token = await getToken(accessToken)
-
             if (token === undefined || token === "") {
                 throw new Error("Authorisation Token is empty/undefined")
             }
