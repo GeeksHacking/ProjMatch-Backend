@@ -3,7 +3,7 @@ import axios from 'axios'
 export default class AuthTokenController {
     static async getAuthToken(req, res, next) {
         try {
-            const accessToken = req.body.accessToken
+            const accessToken = req.query.accessToken
 
             if (accessToken === undefined) {
                 throw new Error("Access Token required to get Authorisation Token")
