@@ -1,4 +1,3 @@
-import { query } from "express"
 import mongodb from "mongodb"
 
 let ObjectID

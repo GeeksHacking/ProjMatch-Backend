@@ -15,6 +15,7 @@ if (process.env.NODE_ENV === 'test') {
 // DAO
 import UsersDAO from "./dao/UsersDAO.js"
 import PostsDAO from "./dao/PostsDAO.js"
+import UsersDAOV2 from "./dao/v2/UsersDAO.js"
 
 dotenv.config()
 
@@ -31,6 +32,7 @@ let mongod;
         const client = await MongoClient.connect(dbUrl, { useNewUrlParser: true })
         await UsersDAO.injectDB(client)
         await PostsDAO.injectDB(client)
+        await UsersDAOV2.injectDB(client)
 
         if (process.env.NODE_ENV !== "test") {
             app.listen(port, () => {
