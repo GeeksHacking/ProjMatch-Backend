@@ -11,6 +11,17 @@ if (process.env.NODE_ENV === 'test') {
 
 let users
 
+function makeStruct(keys) {
+    if (!keys) return null;
+    const count = keys.length;
+    
+    /** @constructor */
+    function constructor() {
+        for (let i = 0; i < count; i++) this[keys[i]] = arguments[i];
+    }
+    return constructor;
+}
+
 export default class UsersDAOV2 {
     static async injectDB(conn) {
         if (users) { return }
@@ -76,22 +87,62 @@ export default class UsersDAOV2 {
     }
 
     static async postUser(username, contact, about, algoData, skills) {
+        // Create a new User in the ProjMatch MongoDB
+        try {
 
+            // User Structure
+            const UserStruct = new makeStruct(["username", "about", "profileImg", "bannerImg", "contact", "rating", "technologies", "savedPosts", "algoData"])
+            const userDoc = new UserStruct(username, about, "", "", contact, 0.0, skills, [], algoData)
+
+            const response = await users.insertOne(userDoc)
+
+            return {
+                "status": "success",
+                "response": response
+            }
+        } catch (err) {
+            return {
+                "status": "failure",
+                "response": err
+            }
+        }    
     }
 
-    static async deleteUser() {
+    static async deleteUser(id) {
+        try {
+            const response = await users.deleteOne({ "_id": new ObjectID(id) })
 
+            if (response.deletedCount !== 0) {
+                return {
+                    "status": "success",
+                    "response": response
+                }
+            } else {
+                return {
+                    "status": "failure",
+                    "response": "Delete Unsuccessful, 0 accounts deleted."
+                }
+            }
+        } catch (err) {
+            return {
+                "status": "failure",
+                "response": err
+            }
+        }
     }
 
     static async putUser(id, update) {
         try {
             const response = await users.updateOne({ "_id": new ObjectID(id)}, { $set: update })
 
-            return response
+            return {
+                "response": response,
+                "status": "success"
+            }
         } catch (err) {
-            throw {
-                "msg": err.message,
-                "statusCode": 500
+            return {
+                "response": err.message,
+                "status": "failure"
             }
         }
     }

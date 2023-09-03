@@ -10,6 +10,8 @@ Once a pull request has been approved and merged into main, GitHub Actions is us
 ## API Authentication
 For testing purposes, an Auth0 Machine-to-Machine (M2M) token is used for authorisation. However, in the production environment, an authorisation token is generated with the user's access token.
 
+---
+
 ## Auth Token API
 The Auth Token API was created to mask the Auth0 Client ID and Client Secret. The front-end will call the Auth Token API with the user's access token as a parameter, and in turn, the API will return the authorisation token.  
 **Endpoint:** ```/api/v1/authtoken```  
@@ -24,8 +26,7 @@ The Auth Token API is a **GET** ONLY API. Call the API with the user's access to
 }
 ```
 
-## Images API
-TODO: Description, GET, POST, PUT and DELETE Requests
+---
 
 ## Posts API
 The Posts API allows you to get, create, update and delete posts from users.  
@@ -35,7 +36,7 @@ The Posts API allows you to get, create, update and delete posts from users.
 {
     "projectName": "",
     "description": "",
-    "images", []
+    "images": [],
     "creatorUserID": "",
     "contact": "",
     "rating": 0.0,
@@ -83,5 +84,59 @@ A POST Request will allow you to create a new project. All information sent to t
 
 ## PUT Request
 TODO: PUT and Delete Requests
+
+---
+
 # Users API
-TODO: Description, GET, POST, PUT and DELETE Requests
+The Users API will allow you to retrieve information about users. To obtain some slightly sensitive information (savedPosts, algoData and technologies), verification of the user's identity is done. With the proper authentication, Users API will allow the front-end to Create, Read, Update and Delete (CRUD) users. 
+
+## Verifying User's Identity
+The specifics of how user identity is verified will be discussed under each request type. In short, when the front-end makes a request to this back-end, a Authorisation Bearer Token is sent. This token is a JSON Web Token (JWT), containing information about the authentication type. Using the Authorisation Token, a request is made to the Auth0 ```/userinfo``` endpoint. This endpoint will return information about the user, for instance, the user's email. This email will be matched to the ProjMatch account's email. If it matches, this is considered as the user's identity is verified.
+
+## GET Request
+A GET Request allows you to retrieve information about a specific user, or get the list of users in the ProjMatch database. You are also allowed to filter by some parameters. These filter parameters are to be added into the API Request's Query Field.
+
+### Authentication and Response
+As mentioned, some data (savedPosts, algoData and technologies) will be filtered if the user sending the request does not match the user in which he/she is retrieving the data of. For instance, if User A tries to get the data of User B, the aforementioned data fields will be removed from the filter request. However, when User A tries to get information on him/herself, those data fields will be added into the request.
+
+### Filtering Users
+1. username
+2. email
+3. userID -- ID of the User stored in MongoDB  
+
+Sample GET Request with a Username Filter: ```(domain)/api/v2/users?username=helloworld```
+
+### Sample Response
+Assuming that the user is **NOT** verified:
+```json
+{
+    "username": "",
+    "about": "",
+    "profileImg": "",
+    "bannerImg": "",
+    "contact": "",
+    "rating": 0.0,
+}
+```
+Assuming the user **IS** verified:
+```json
+{
+    "username": "",
+    "about": "",
+    "profileImg": "",
+    "bannerImg": "",
+    "contact": "",
+    "rating": 0.0,
+    "technologies": [],
+    "savedPosts": [],
+    "algoData": []
+}
+```
+
+## POST Request
+TODO: POST, PUT and DELETE Requests
+
+---
+
+## Images API
+The Images API is deprecated. When performing CRUD Operations on a User/Project, if a new image is to be added, the respective APIs will handle Image Services. The AWS S3 URL will be returned, removing the need for the Images API.

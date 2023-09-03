@@ -104,7 +104,14 @@ export default class UsersControllerV2 {
                 // User does not exist, so can create user
                 const response = await UsersDAOV2.postUser(username, contact, about, algoData, skills)
 
-                // TODO
+                if (response.status === "failure") {
+                    return {
+                        "msg": `Failed to add a new user with Error: ${response.response}`,
+                        "statusCode": 500
+                    }
+                }
+
+                res.status(200).json(response)
             }
 
         } catch (err) {
@@ -142,7 +149,14 @@ export default class UsersControllerV2 {
                 // User is authenticated
                 const response = await UsersDAOV2.putUser(id, update)
 
-                res.status(200).json({ status: "success", updated: response })
+                if (response.status === "success") {
+                    res.status(200).json({ status: "success", updated: response })
+                } else {
+                    throw {
+                        "msg": response.response,
+                        "statusCode": 500
+                    }
+                }
             } else {
                 // User does not have permission to update this person
                 throw {
@@ -156,6 +170,51 @@ export default class UsersControllerV2 {
     }
 
     static async apiDeleteUsers(req, res) {
+        const bearerToken = req.headers["authorization"]
 
+        try {
+            const id = req.body.id
+
+            if (id === undefined) {
+                throw {
+                    "msg": "User ID returned undefined",
+                    "statusCode": 400
+                }
+            }
+
+            // Verify if user is authorised to edit user
+            const userInfoFromAuth0 = await getUserInformationAuth0(bearerToken)
+            const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: id }) // get user with UserID
+            /// If there are no users with the ID, throw error
+            if ( totalUsers === 0 ) {
+                throw {
+                    "msg": `User with UserID of ${id} does not exist.`,
+                    "statusCode": 400
+                }
+            }
+
+            /// Check if the user from userList has the same email as userInfoFromAuth0
+            if (usersList[0].contact === userInfoFromAuth0.email) {
+                // User is Authenticated
+                const response = await UsersDAOV2.deleteUser(id)
+
+                if (response.status === "success") {
+                    res.status(200).json({ status: "success", deletedUserWithID: id, response: response })
+                } else {
+                    throw {
+                        "msg": response.response,
+                        "statusCode": 500
+                    }
+                }
+            } else {
+                // User does not have permission to delete user
+                throw {
+                    "msg": `You do not have permission to delete user with ID of ${id}`,
+                    "statusCode": 403
+                }
+            }
+        } catch (err) {
+            res.status(err.statusCode).json({ error: err.msg })
+        }
     }
 }
