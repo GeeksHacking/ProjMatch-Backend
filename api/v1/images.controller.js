@@ -45,8 +45,6 @@ export default class ImagesController {
             const creatorUserID = req.body.creatorUserID
             let type = ""
 
-            console.log(req)
-
             if (creatorUserID === undefined) {
                 throw new Error("creatorUserID returned undefined, field is required")
             }

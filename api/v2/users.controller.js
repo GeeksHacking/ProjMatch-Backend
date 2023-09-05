@@ -1,19 +1,7 @@
 import UsersDAOV2 from '../../dao/v2/UsersDAO.js'
-import axios from 'axios'
+import Auth0UserInfo from './auth0.userinfo.js'
 
 export default class UsersControllerV2 {
-    async getUserInformationAuth0(bearerToken) {
-        const apiOptions = {
-            method: "GET",
-            url: `${process.env.AUTH0_ISSUER_BASE_URL}/userinfo`,
-            authorization: `Bearer ${bearerToken}`
-        }
-
-        const response = await axios.request(apiOptions)
-
-        return response
-    }
-
     static async apiGetUsers(req, res) {
         try {
             const usersPerPage = req.query.usersPerPage ? parseInt(req.query.usersPerPage, 10) : 100 // Default to showing a maximum of 100 users per page
@@ -41,13 +29,12 @@ export default class UsersControllerV2 {
 
             // Sort the data, and only show necessary info
             /// Get user information from Auth0 using /userinfo endpoint
-            const bearerToken = req.headers["authorization"]
-            const userInfoFromAuth0 = await getUserInformationAuth0(bearerToken)
-
+            const bearerToken = req.headers["authorization"].split(" ")[1]
+            const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             /// Loop through Users List, remove unnecessary info. If that user is the user requesting for info, all info can be added
-            let newUsersList = null
+            let newUsersList = []
             for (let i = 0; i < usersList.length; i++) {
-                if (usersList[i].email !== userInfoFromAuth0.email) {
+                if (usersList[i].contact !== userInfoFromAuth0.data.email) {
                     let temp = usersList[i]
                     delete temp.savedPosts
                     delete temp.algoData
@@ -70,12 +57,12 @@ export default class UsersControllerV2 {
             // Send JSON Response
             res.status(200).json(response)
         } catch (err) {
-            res.status(err.statusCode).json({ error: err.msg })
+            res.status(err.statusCode ? err.statusCode : 500).json({ error: err.msg ? err.msg : err.message })
         }
     }
 
     static async apiPostUsers(req, res) {
-        const bearerToken = req.headers["authorization"]
+        const bearerToken = req.headers["authorization"].split(" ")[1]
 
         try {
             const username = req.body.username
@@ -120,7 +107,7 @@ export default class UsersControllerV2 {
     }
 
     static async apiPutUsers(req, res) {
-        const bearerToken = req.headers["authorization"]
+        const bearerToken = req.headers["authorization"].split(" ")[1]
 
         try {
             // Get Data from API Request Body
@@ -135,7 +122,7 @@ export default class UsersControllerV2 {
             }
 
             // Verify if user is authorised to edit user
-            const userInfoFromAuth0 = await getUserInformationAuth0(bearerToken)
+            const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: id }) // get user with UserID
             /// If there are no users with the ID, throw error
             if ( totalUsers === 0 ) {
@@ -145,7 +132,7 @@ export default class UsersControllerV2 {
                 }
             }
             /// Check if the user from userList has the same email as userInfoFromAuth0
-            if (usersList[0].contact === userInfoFromAuth0.email) {
+            if (usersList[0].contact === userInfoFromAuth0.data.email) {
                 // User is authenticated
                 const response = await UsersDAOV2.putUser(id, update)
 
@@ -170,7 +157,7 @@ export default class UsersControllerV2 {
     }
 
     static async apiDeleteUsers(req, res) {
-        const bearerToken = req.headers["authorization"]
+        const bearerToken = req.headers["authorization"].split(" ")[1]
 
         try {
             const id = req.body.id
@@ -183,7 +170,7 @@ export default class UsersControllerV2 {
             }
 
             // Verify if user is authorised to edit user
-            const userInfoFromAuth0 = await getUserInformationAuth0(bearerToken)
+            const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: id }) // get user with UserID
             /// If there are no users with the ID, throw error
             if ( totalUsers === 0 ) {
@@ -194,7 +181,7 @@ export default class UsersControllerV2 {
             }
 
             /// Check if the user from userList has the same email as userInfoFromAuth0
-            if (usersList[0].contact === userInfoFromAuth0.email) {
+            if (usersList[0].contact === userInfoFromAuth0.data.email) {
                 // User is Authenticated
                 const response = await UsersDAOV2.deleteUser(id)
 

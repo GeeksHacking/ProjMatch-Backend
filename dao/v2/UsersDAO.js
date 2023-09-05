@@ -1,5 +1,4 @@
 import mongodb from "mongodb"
-import axios from "axios"
 
 let ObjectID
 if (process.env.NODE_ENV === 'test') {
@@ -66,10 +65,10 @@ export default class UsersDAOV2 {
                 }
             }
 
-            const displayCursor = cursor.limit(usersPerPage).skip(usersPerPage * page)
             try {
+                const displayCursor = cursor.limit(usersPerPage).skip(usersPerPage * page)
                 const usersList = await displayCursor.toArray()
-                const totalUsers = await users.countDocuments(userQuery)
+                const totalUsers = await users.countDocuments(query)
 
                 return { usersList, totalUsers }
             } catch (err) {
@@ -80,8 +79,8 @@ export default class UsersDAOV2 {
             }
         } catch (err) {
             throw {
-                "msg": "Unnknown Error Occured",
-                "statusCode": 500
+                "msg": err.msg ? err.msg : "An unknown error occured",
+                "statusCode": err.statusCode ? err.statusCode : 500
             }
         }
     }

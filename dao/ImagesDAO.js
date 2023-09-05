@@ -58,9 +58,15 @@ export default class ImagesDAO {
                 results[i] = response
             }
 
-            return results
+            return {
+                "response": results,
+                "status": "success"
+            }
         } catch (err) {
-            return {error: err}
+            return {
+                "response": err.message,
+                "status": "failure"
+            }
         }
     }
 
