@@ -32,8 +32,24 @@ export default class PostsDAOV2 {
         }
     }
 
-    static async getPosts() {
+    static async getPosts({
+        filters = null,
+        page = 0,
+        postsPerPage = 100
+    }) {
+        // Query 
+        let query
 
+        if(filters) {
+            if("id" in filters) {
+                query = { "_id": new ObjectID(filters["id"]) }
+            } else if ("userID" in filters) {
+                query = { "creatorUserID": { $eq: filters["userID"] } }
+            }
+            else if ("search" in filters) {
+                query = { "projectName": { $regex: filters["search"], $options: "i" } }
+            }
+        }
     }
 
     static async postPosts(projectName, description, creatorUserID, contact, ratings, tags, technologies, images) {

@@ -78,28 +78,37 @@ export default class UsersControllerV2 {
                 }
             }
 
+            // Verify if the user has permission to make a new user under the email
+            const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
+            if (contact !== userInfoFromAuth0.data.email) {
+                throw {
+                    "msg": "You do not have permission to create a new user under this contact!",
+                    "statusCode": 401
+                }
+            }
+
             // Check if the User already exists
-            // TODO: Call the UsersDAOV2 GetUsers API
-            const { resUserList, resTotalUsers } = await UsersDAOV2.getUser({ filters, page, usersPerPage })
+            const getUserFilters = { "username": username }
+            const { resUserList, resTotalUsers } = await UsersDAOV2.getUser({ getUserFilters, page, usersPerPage })
             if (resTotalUsers !== 0) {
                 // User already exists
                 throw {
                     "msg": "User already exists! Cannot create user.",
                     "statusCode": 400
                 }
-            } else {
-                // User does not exist, so can create user
-                const response = await UsersDAOV2.postUser(username, contact, about, algoData, skills)
-
-                if (response.status === "failure") {
-                    return {
-                        "msg": `Failed to add a new user with Error: ${response.response}`,
-                        "statusCode": 500
-                    }
-                }
-
-                res.status(200).json(response)
             }
+
+            // User does not exist, so can create user
+            const response = await UsersDAOV2.postUser(username, contact, about, algoData, skills)
+
+            if (response.status === "failure") {
+                return {
+                    "msg": `Failed to add a new user with Error: ${response.response}`,
+                    "statusCode": 500
+                }
+            }
+
+            res.status(200).json(response)
 
         } catch (err) {
             res.status(err.statusCode).json({ error: err.msg })
