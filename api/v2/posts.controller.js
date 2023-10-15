@@ -18,7 +18,7 @@ export default class PostsControllerV2 {
                 filters.search = req.query.search
             }
 
-            const { postsList, totalPosts } = await PostsDAO.getPosts({
+            const { postsList, totalPosts } = await PostsDAOV2.getPosts({
                 filters,
                 page,
                 postsPerPage
@@ -86,7 +86,7 @@ export default class PostsControllerV2 {
                 imageURLs.push(imagesResponse.response[i].Location)
             }
 
-            if (imageURLs === []) {
+            if (imageURLs.length === 0) {
                 throw {
                     "msg": `Failed to get image URLs with Error: ${imagesResponse.msg}`,
                     "statusCode": 500
@@ -124,7 +124,36 @@ export default class PostsControllerV2 {
         const bearerToken = req.headers["authorization"].split(" ")[1]
 
         try {
+            const postID = req.body.id
 
+            // Verify User Identity
+            const postReqFilter = { id: postID }
+            const { postsList, totalPosts } = await PostsDAOV2.getPosts({ postReqFilter })
+            if (postsList.length === 0) {
+                throw {
+                    "msg": `Post with ${postID} not found.`,
+                    "statusCode": 404
+                }
+            }
+            const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
+            if (postsList[0].contact !== userInfoFromAuth0.data.email) {
+                throw {
+                    "msg": "User not authorized to delete post",
+                    "statusCode": 401
+                }
+            }
+
+            // If verified, delete post
+            const deleteResponse = await PostsDAOV2.deletePosts(postID)
+
+            if (deleteResponse.status === "failure") {
+                throw {
+                    "msg": deleteResponse.response,
+                    "statusCode": 500
+                }
+            }
+
+            res.status(200).json({ status: "success", deletedProjectWithID: postID })
         } catch (err) {
             res.status(err.statusCode ? err.statusCode : 500).json({ error: err.msg ? err.msg : err.message })
         }

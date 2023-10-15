@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'test') {
     ObjectID = mongodb.ObjectId
 }
 
-let users
+let posts
 
 function makeStruct(keys) {
     if (!keys) return null;
@@ -23,10 +23,10 @@ function makeStruct(keys) {
 
 export default class PostsDAOV2 {
     static async injectDB(conn) {
-        if (users) { return }
+        if (posts) { return }
 
         try {
-            users = await conn.db("usersMain").collection("users")
+            posts = await conn.db("usersMain").collection("posts")
         } catch(err) {
             console.error(`Cannot create a connection handle for in usersDAO with: ${err}`)
         }
@@ -48,6 +48,32 @@ export default class PostsDAOV2 {
             }
             else if ("search" in filters) {
                 query = { "projectName": { $regex: filters["search"], $options: "i" } }
+            }
+        }
+
+        // Cursor
+        let cursor
+        try {
+            cursor = await posts
+                .find(query)
+        } catch (err) {
+            console.log(err)
+            throw {
+                "msg": "Unable to find posts with specified query",
+                "statusCode": 404
+            }
+        }
+
+        try {
+            const displayCursor = cursor.limit(postsPerPage).skip(postsPerPage * page)
+            const postsList = await displayCursor.toArray()
+            const totalPosts = await posts.countDocuments(query)
+
+            return { postsList, totalPosts }
+        } catch (err) {
+            throw {
+                "msg": `Unable to convert cursor to array, or a problem occured when counting documents: ${err}`,
+                "statusCode": 500
             }
         }
     }
@@ -78,11 +104,32 @@ export default class PostsDAOV2 {
         }
     }
 
-    static async putPosts() {
-
+    static async putPosts(id) {
+        
     }
-
-    static async deletePosts() {
-
+    
+    static async deletePosts(id) {
+        try {
+            const deleteRequest = await posts.deleteOne({
+                "_id": new ObjectID(id)
+            })
+    
+            if (deleteRequest.deletedCount === 0) {
+                return {
+                    "response": "No post deleted",
+                    "status": "failure"
+                }
+            }
+    
+            return {
+                "response": deleteRequest,
+                "status": "success"
+            }
+        } catch (err) {
+            return {
+                "response": err,
+                "status": "failure"
+            }
+        }
     }
 }

@@ -42,7 +42,7 @@ app.use("/api/v1/authtoken", authToken)
 
 // V2 API
 app.use("/api/v2/users", jwtCheck, usersv2)
-app.use("/api/v2/posts", jwtCheck, postsv2)
+app.use("/api/v2/posts", postsv2)
 
 // Default
 app.use("*", (req, res) => res.status(404).json({error: "Not Found"}))
