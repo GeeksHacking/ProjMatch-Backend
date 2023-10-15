@@ -104,8 +104,31 @@ export default class PostsDAOV2 {
         }
     }
 
-    static async putPosts(id) {
-        
+    static async putPosts(id, update) {
+        try {
+            const updateRequest = await posts.updateOne({
+                "_id": new ObjectID(id)
+            }, {
+                $set: update
+            }) 
+
+            if (updateRequest.modifiedCount === 0) {
+                return {
+                    "response": "No post updated",
+                    "status": "failure"
+                }
+            }
+
+            return {
+                "response": updateRequest,
+                "status": "success"
+            }
+        } catch (err) {
+            return {
+                "response": err,
+                "status": "failure"
+            }
+        }
     }
     
     static async deletePosts(id) {

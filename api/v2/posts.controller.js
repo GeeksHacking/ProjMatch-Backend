@@ -113,8 +113,45 @@ export default class PostsControllerV2 {
         const bearerToken = req.headers["authorization"].split(" ")[1]
 
         try {
-            
+            const postID = req.body.id
+            const update = req.body.update
 
+            // Check for missing parameters
+            if (postID === undefined || update === undefined) {
+                throw {
+                    "msg": "Post ID or update field returned undefined",
+                    "statusCode": 400
+                }
+            }
+
+            // Verify User Identity
+            const postReqFilter = { id: postID }
+            const { postsList, totalPosts } = await PostsDAOV2.getPosts({ postReqFilter })
+            if (postsList.length === 0) {
+                throw {
+                    "msg": `Post with ${postID} not found.`,
+                    "statusCode": 404
+                }
+            }
+            const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
+            if (postsList[0].contact !== userInfoFromAuth0.data.email) {
+                throw {
+                    "msg": "User not authorized to update post",
+                    "statusCode": 401
+                }
+            }
+
+            // If verified, update post
+            const updateResponse = await PostsDAOV2.putPosts(id, update)
+
+            if (updateResponse.status === "failure") {
+                throw {
+                    "msg": deleteResponse.response,
+                    "statusCode": 500
+                }
+            }
+
+            res.status(200).json({ status: "success", updatedProjectWithID: postID })
         } catch (err) {
             res.status(err.statusCode ? err.statusCode : 500).json({ error: err.msg ? err.msg : err.message })
         }
@@ -125,6 +162,14 @@ export default class PostsControllerV2 {
 
         try {
             const postID = req.body.id
+
+            // Check for missing PostID
+            if (postID === undefined) {
+                throw {
+                    "msg": "Post ID returned undefined",
+                    "statusCode": 400
+                }
+            }
 
             // Verify User Identity
             const postReqFilter = { id: postID }
