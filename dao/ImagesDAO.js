@@ -83,7 +83,7 @@ export default class ImagesDAO {
                     Key: `${folderName}/${imageNames[i]}`
                 }
 
-                const res =await S3.deleteObject(param).promise()
+                const res = await S3.deleteObject(param).promise()
                 results[i] = res
             }
 

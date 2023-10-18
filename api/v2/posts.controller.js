@@ -180,6 +180,7 @@ export default class PostsControllerV2 {
                     "statusCode": 404
                 }
             }
+            const deletedProjImages = postsList[0].images
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             if (postsList[0].contact !== userInfoFromAuth0.data.email) {
                 throw {
@@ -197,6 +198,17 @@ export default class PostsControllerV2 {
                     "statusCode": 500
                 }
             }
+
+            // Delete the Related Images from AWS S3
+            const folderName = ""
+            const imgNames = []
+            //https://projmatch-photos.s3.ap-southeast-1.amazonaws.com/24b8a27590ade680009c375902b08278bdedddc400fa92a55278f5c7576cd42c/2879667a-9959-4de0-9ffd-9e73bff14c15.png
+            for (let i = 0; i < deletedProjImages.length; i++) {
+                const imageurl = deletedProjImages[i]
+                folderName = imageurl.split("/")[3]
+                imgNames.push(imageurl.split("/")[4])
+            }
+            const deleteImgResponse = await ImagesDAO.deleteImages(folderName, imgNames)
 
             res.status(200).json({ status: "success", deletedProjectWithID: postID })
         } catch (err) {

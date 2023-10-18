@@ -134,9 +134,15 @@ Assuming the user **IS** verified:
 ```
 
 ## POST Request
+A POST Request to the Users API allows you to create a new user. However, this method will only be authorised if the contact email of the new user matches the email that is used to sign in with Auth0.  
+
+All fields are required when creating a new user. The **username, contact, about, algoData and skills**. Add these fields into the request body.  
+
+## PUT Request
+
 TODO: POST, PUT and DELETE Requests
 
 ---
 
 ## Images API
-The Images API is deprecated. When performing CRUD Operations on a User/Project, if a new image is to be added, the respective APIs will handle Image Services. The AWS S3 URL will be returned, removing the need for the Images API.
+The Images API is deprecated. When performing CRUD Operations on a User/Project, if a new image is to be added, the respective APIs will handle Image Services. The Image URL from S3 will be returned, removing the need for the Images API.
