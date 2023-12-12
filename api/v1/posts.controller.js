@@ -69,6 +69,7 @@ export default class PostsController {
                 throw new Error("ID or Update Field is undefined.")
             }
 
+            
             const updateResponse = await PostsDAO.updateProject(id, update)
 
             res.json({ status: "success", updated: updateResponse })

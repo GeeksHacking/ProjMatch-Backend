@@ -97,7 +97,7 @@ export default class PostsDAO {
         }
     }
     
-    static async addProject(projectName, description, creatorUserID, contact, ratings, tags, technologies, images, isArchived) {
+    static async addProject(projectName, description, creatorUserID, contact, ratings, tags, technologies, images) {
         try {
             const PostStruct = new makeStruct(["projectName", "description", "images", "creatorUserID", "contact", "rating", "tags", "technologies", "algoData"])
             

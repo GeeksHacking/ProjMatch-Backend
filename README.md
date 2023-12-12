@@ -1,213 +1,148 @@
 # ProjMatch BackEnd API
-Documentation on how to use the ProjMatch Backend API. If anything does not work as intended or a strange error has occured, please let me know
+Documentation on how to use ProjMatch's Backend API and a brief description on how it works. Do note that the Back-End is only meant to be called from the ProjMatch site ([projmatch.geekshacking.com](https://projmatch.geekshacking.com)) or from localhost.
 
-# API Authentication
-- In order to send requests to the API, you will need to have an access token. This can be generated from the Auth0 Dashboard.
-    - Do create an Auth0 Account, and send your email to me
-## Generating a M2M Access Token
-- When in a Development Environemt testing the API (you shouldn't need to), send a **POST Request** to `https://projmatch.au.auth0.com/oauth/token`
-    - client_id, client_secret and audience is the same used in the _.env_ file
-- Then, when sending the GET/POST/PUT/DELETE Requests, paste the Access Token as a _Bearer Token_ in the Request Header
-### Sample JSON POST Body
+## Unit Tests
+This repository contains Unit Tests for the Images, Posts and Users API. Unit Tests are run on GitHub actions on every push and pull request. Pull requests will only be accepted if all unit tests passes!
+
+## Continuous Delivery
+Once a pull request has been approved and merged into main, GitHub Actions is used to automatically dockerise the project, and deploy it to Google Cloud Run. In an event in which the deployment fails, Cloud Run will continue using the last working deployment.
+
+## API Authentication
+For testing purposes, an Auth0 Machine-to-Machine (M2M) token is used for authorisation. However, in the production environment, an authorisation token is generated with the user's access token.
+
+---
+
+## Auth Token API
+The Auth Token API was created to mask the Auth0 Client ID and Client Secret. The front-end will call the Auth Token API with the user's access token as a parameter, and in turn, the API will return the authorisation token.  
+**Endpoint:** ```/api/v1/authtoken```  
+
+
+### Calling the Auth Token API
+The Auth Token API is a **GET** ONLY API. Call the API with the user's access token in the request body.
+#### Sample Request Body
 ```json
 {
-    "client_id": "",
-    "client_secret": "",
-    "audience": "",
-    "grant_type": "client_credentials"
+    accessToken: "token_goes_here"
 }
 ```
 
-## Getting Past Authentication
-To get more information about how to get the unique access token for the user and to use Auth0 for user authentication, visit [https://auth0.com/blog/ultimate-guide-nextjs-authentication-auth0/](https://auth0.com/blog/ultimate-guide-nextjs-authentication-auth0/).
-- In other words, import getAccessToken, withApiAuthRequired from '@auth0/nextjs-auth0', then use the getAccessToken to get the access token before adding it into the header of the API Request, and making the request
+---
 
-
-# Get User Details
-## User Information Types
-1. username -- **Required for User Creation**
-2. about -- **Required for User Creation**
-3. contact -- **Required for User Creation**
-4. skills -- **Required for User Creation**
-5. algoData
-## API Requests
-Use `(domain)/api/v1/users` to communicate with the User API
-- Additional query can be appended to the URL to get certain information _(only applicable for GET requests)_
-- Information is required in the API Request body
-### GET Request
-- A **GET Request** responds with a maximum of 1000 users. Use the _page_ query to display the next 1000 users
-- If there is an error, the API will return with an error code 500. Handle the error as necessary
-- The body is not required when running a GET Request
-
-| Filter | Query String |
-| --- | --- |
-| Username | user |
-| Email | email |
-| Phone Number | ph |
-
-Example of Filter Request: `(domain)/api/v1/users?user=helloworld`
-
-For GET Requests, you can also specify the **page number** and **number of shown users per page**
-- To do this, just add another Query String behind
-
-**API Response**
-- The API will respond with _users_, _page_, _filters_, _usersPerPage_, _totalUsers_
-    - _users_ will be the list of a max of _usersPerPage_
-        - By default, the _usersPerPage_ is set to 1000. Configure this through adding a Query String
-    - Increase or Decrease the _page_ in order to move through the x number of _usersPerPage_
-    - Lastly, _totalUsers_ will return the total number of user accounts on the platform
-
-### POST Request
-- A **POST Request** allows you to create new user  
-
-**Creation of a New User**
-1. To create a new user, 4 arguments are needed in the body of the API Request  
-    1. username
-    2. rlName
-    3. regEmail
-    4. regPhone
-    - Regarding _regEmail_ and _regPhone_, it is NOT COMPULSORY to have both. One of the fields can be set to an empty string. However, do ensure that one of the fields have data.
-2. Send the POST Request to the API
-3. If there is an error, the API will return with an Error Code 500. Handle the error as necessary  
-
-**Example of a body of the POST Request**  
+## Posts API
+The Posts API allows you to get, create, update and delete posts from users.  
+**Endpoint:** ```/api/v1/posts```
+## Post Schema
 ```json
 {
-   "username": "someUsername",
-    "pw": "abc123",
-    "rlName": "John Doe",
-    "regEmail": "email@email.com",
-    "regPhone": "+65000000"
-}
-```
-
-**API Response**
-- The API will return the _status_, _addedUserWithUsername_ and _addedUserWithID_
-    - _addedUserWithUsername_ returns the username of the user added
-    - _addedUserWithID_ returns the ID of the user added
-
-### PUT Request
-- A **PUT Request** allows you to update the user information of a specific user
-
-**Updating a User's Information**
-1. To update a user's information, 2 arguments are required in the body of the API Request  
-    1. id (This refers to the ID of the User, NOT the user's username)
-    2. update
-        - The update object should contain the fields that you want to change
-        - The naming convention of the fields should follow the _User Information Types_
-2. Send the PUT Request to the API
-3. If there is an error, the API will return with an Error Code 500. Handle the error as necessary
-
-**Example of a body of the PUT Request**  
-```json
-{
-    "id": "64187ab0d6a4b0713becd1a0",
-    "update": {
-        "username": "this_is_a_new_username",
-        "regEmail": "newEmail@email.com"
-    }
-}
-```
-
-**API Response**
-- The API will return with _status_ and _updated_
-    - Where _updated_ will contain an key value pair of the fields you have updated
-
-### DELETE Request
-- A **DELETE Request** allows you to delete a user's profile
-- **ENSURE THAT A USER HAS DOUBLE-CONFIRMED BEFORE SENDING A DELETE REQUEST.** A DELETE Request is irreversable
-- To delete the user, only the user id is required in the body of the API Request
-
-**Example of a body of the PUT Request**  
-```json
-{
-    "id": "64187ab0d6a4b0713becd1a0"
-}
-```
-
-**API Response**
-- The API will return with _status_, _deletedUserWithID_ and _response_
-    - _deletedUserWithID_ tells you the ID of the user which you have just deleted
-    - and _response_ is the response of the MongoDB API. In most cases, this can be ignored. However, incase of an error, you can take a look at the _response_ field to identify the error
-
-# Get Post Details
-
-## User Information Types
-All fields are compulsory when creating a post
-
-1. projectName
-2. description
-3. creatorUserID
-4. rating _(Not needed when creating a project, defaults to 0.0. Should never be updated by user)_
-5. tags
-6. technologies
-7. images
-8. isArchived _(Not needed when creating a project)_
-
-## API Requests
-- The GET/POST/PUT/DELETE Requests works the same as the ones for the Users API
-    - However, do note that some of the field names are different. Refer to User Information Types to see the different field names used in the Posts API
-- For **PUT and DELETE Requests**, they have the same requirement as the Users API, where you need the ID and things to update in a update object and just the ID respectively
-- Do reach out if you need help with making an API Request to get Posts
-
-# Image API
-The Image API works differently from the Posts and Users API as it uses the Amazon S3 Database as compared to the MongoDB Database the other APIs use
-## API Requests
-
-### GET Request
-- A **GET Request** allows you to get images to a certain project
-    - A **GET Request** will return all the imageURLs located in a certain project
-
-**API Request Fields**
-- What each field requires is pretty self-explainatory, but do let me know if you have any queries
-1. projectName _(This is only needed when you are getting the images of a project)_
-2. creatorUserID _(This is NOT the ID of the Project!!)_
-
-**API Response**
-- The API will respond with the status, the response of the S3 SDK and the imageURL
-    - In this case, the _status_ and _imageURL_ is of the more important fields.
-    - _imageURL_ will be an array of URLs leading to the images you have uploaded
-- In an event of a error, the request will return an error, and in the API Response Body, the error message can be retrieved from 'error'
-
-### POST Request
-- A **POST Request** allows you to add images to a certain project
-- To send a **POST Request**, instead of adding things into the Body of the API Request, you have to specify that it is 'form-data'.
-    - Once the **POST Request** has been sent, the API will respond you with an array of imageURLs, which contains the URL where you can find the image in S3.
-    - When loading the image in front-end, adding the _href_ as the imageURL should work fine.
-
-**API Request Fields**
-- What each field requires is pretty self-explainatory, but do let me know if you have any queries
-1. images
-2. projectName _(This is only needed when you are adding the images of a project)_
-3. creatorUserID _(This is NOT the ID of the Project!!)_
-
-**API Response**
-- The API will respond with the status, the response of the S3 SDK and the imageURL
-    - In this case, the _status_ and _imageURL_ is of the more important fields.
-    - _imageURL_ will be an array of URLs leading to the images you have uploaded
-- In an event of a error, the request will return an error, and in the API Response Body, the error message can be retrieved from 'error'
-
-### DELETE Request
-- A **DELETE Request** allows you to some (or all) of the images related to a certain project
-- **ENSURE THAT A USER HAS DOUBLE-CONFIRMED BEFORE SENDING A DELETE REQUEST.** A DELETE Request is irreversable
-- To delete images, the projectName, creatorUserID, and list of image names are required
-
-**API Request Fields**
-- What each field requires is pretty self-explainatory, but do let me know if you have any queries
-1. imageName
-2. projectName _(This is only needed when you are getting the images of a project)_
-3. creatorUserID _(This is NOT the ID of the Project!!)_
-
-**Example of a body of the DELETE Request**  
-```json
-{
-    "projectName": "projmatch",
+    "projectName": "",
+    "description": "",
+    "images": [],
     "creatorUserID": "",
-    "imageName": ["c62c830b-ca58-4855-9ff4-d0c3ee7b1a21.png"]
+    "contact": "",
+    "rating": 0.0,
+    "tags": [],
+    "technologies": [],
+    "algoData": []
+}
+``` 
+
+## GET Request
+A GET Request will allow you to obtain information relating to either ALL Posts, or a Specific Post. You are able to specify the number of posts you want to retrieve, and the page number. Depending on the page number, the next _x_ posts will be returned through the API.
+
+### Retrieving Specific Posts
+You are able to retrieve specific posts using the following methods: 
+1. id -- Project ID
+2. userID -- ID of a User (will return all posts created by that user)
+3. search -- Project Name
+
+These parameters are to be added into the query field of the URL.
+Example of Filter Request: `(domain)/api/v1/posts?search=projmatch`
+
+## POST Request
+A POST Request will allow you to create a new project. All information sent to the API in a POST Request shoud be added into the request body. POST Requests require the following compulsory information:
+1. projectName
+    - The name of the project
+    - Type: String
+2. description
+    - Description of what the project is
+    - Type: String
+3. creatorUserID
+    - ID of the Project Creator
+    - Type: String
+4. tags
+    - Various tags specified by the project creator
+    - Type: Array of Strings
+5. technologies
+    - Technologies that will be used in the project
+    - Type: Array of Strings
+6. images
+    - Call the Image API first to get the image URL in AWS S3 before storing into this array
+    - Type: Array of URLs (stored as an Array of Strings)
+7. contact
+    - How other users can contact the project creator
+    - Type: String
+
+## PUT Request
+TODO: PUT and Delete Requests
+
+---
+
+# Users API
+The Users API will allow you to retrieve information about users. To obtain some slightly sensitive information (savedPosts, algoData and technologies), verification of the user's identity is done. With the proper authentication, Users API will allow the front-end to Create, Read, Update and Delete (CRUD) users. 
+
+## Verifying User's Identity
+The specifics of how user identity is verified will be discussed under each request type. In short, when the front-end makes a request to this back-end, a Authorisation Bearer Token is sent. This token is a JSON Web Token (JWT), containing information about the authentication type. Using the Authorisation Token, a request is made to the Auth0 ```/userinfo``` endpoint. This endpoint will return information about the user, for instance, the user's email. This email will be matched to the ProjMatch account's email. If it matches, this is considered as the user's identity is verified.
+
+## GET Request
+A GET Request allows you to retrieve information about a specific user, or get the list of users in the ProjMatch database. You are also allowed to filter by some parameters. These filter parameters are to be added into the API Request's Query Field.
+
+### Authentication and Response
+As mentioned, some data (savedPosts, algoData and technologies) will be filtered if the user sending the request does not match the user in which he/she is retrieving the data of. For instance, if User A tries to get the data of User B, the aforementioned data fields will be removed from the filter request. However, when User A tries to get information on him/herself, those data fields will be added into the request.
+
+### Filtering Users
+1. username
+2. email
+3. userID -- ID of the User stored in MongoDB  
+
+Sample GET Request with a Username Filter: ```(domain)/api/v2/users?username=helloworld```
+
+### Sample Response
+Assuming that the user is **NOT** verified:
+```json
+{
+    "username": "",
+    "about": "",
+    "profileImg": "",
+    "bannerImg": "",
+    "contact": "",
+    "rating": 0.0,
+}
+```
+Assuming the user **IS** verified:
+```json
+{
+    "username": "",
+    "about": "",
+    "profileImg": "",
+    "bannerImg": "",
+    "contact": "",
+    "rating": 0.0,
+    "technologies": [],
+    "savedPosts": [],
+    "algoData": []
 }
 ```
 
-**API Response**
-- The API will respond with a status code (status) and a list of images (deletedImagesWithNames)
-    - From _deletedImagesWithNames_, you can see what images you have deleted
-    - Do note that these images cannot be brought back!
+## POST Request
+A POST Request to the Users API allows you to create a new user. However, this method will only be authorised if the contact email of the new user matches the email that is used to sign in with Auth0.  
+
+All fields are required when creating a new user. The **username, contact, about, algoData and skills**. Add these fields into the request body.  
+
+## PUT Request
+
+TODO: POST, PUT and DELETE Requests
+
+---
+
+## Images API
+The Images API is deprecated. When performing CRUD Operations on a User/Project, if a new image is to be added, the respective APIs will handle Image Services. The Image URL from S3 will be returned, removing the need for the Images API.

@@ -21,6 +21,7 @@ export default class AuthTokenController {
                     client_secret: process.env.AUTH0_CLIENT_SECRET,
                     audience: process.env.AUTH0_AUDIENCE,
                     code: accessToken,
+                    scope: "openid email profile",
                     redirect_uri: `${process.env.AUTH0_BASE_URL}/Load`,
                 }),
             };

@@ -58,9 +58,15 @@ export default class ImagesDAO {
                 results[i] = response
             }
 
-            return results
+            return {
+                "response": results,
+                "status": "success"
+            }
         } catch (err) {
-            return {error: err}
+            return {
+                "response": err.message,
+                "status": "failure"
+            }
         }
     }
 
@@ -77,7 +83,7 @@ export default class ImagesDAO {
                     Key: `${folderName}/${imageNames[i]}`
                 }
 
-                const res =await S3.deleteObject(param).promise()
+                const res = await S3.deleteObject(param).promise()
                 results[i] = res
             }
 
