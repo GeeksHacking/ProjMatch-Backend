@@ -1,6 +1,7 @@
-import ImagesDAO from "../../dao/ImagesDAO.js"
-import PostsDAOV2 from "../../dao/v2/PostsDAO.js"
-import Auth0UserInfo from "./auth0.userinfo.js"
+import ImagesDAO from "../../../dao/ImagesDAO.js"
+import PostsDAOV2 from "../../../dao/v2/PostsDAO.js"
+import Auth0UserInfo from "../auth0.userinfo.js"
+import UpdateToNewPostSchema from "../../../helper/UpdatePosts.js"
 
 export default class PostsControllerV2 {
     static async apiGetPosts(req, res) {
@@ -24,8 +25,15 @@ export default class PostsControllerV2 {
                 postsPerPage
             })
 
+            const updatedPostList = []
+            for (let i = 0; i < postsList.length; i++) {
+                const updatedPost = UpdateToNewPostSchema(postsList[i])
+                
+                updatedPostList.push(updatedPost !== null ? updatedPost : postsList[i])
+            }
+
             let response = {
-                posts: postsList,
+                posts: updatedPostList,
                 page: page,
                 filters: filters,
                 postsPerPage: postsPerPage,
@@ -40,7 +48,6 @@ export default class PostsControllerV2 {
 
     static async apiPostPosts(req, res) {
         const bearerToken = req.headers["authorization"].split(" ")[1]
-
 
         try {
             const images = req.images

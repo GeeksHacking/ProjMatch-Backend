@@ -1,5 +1,5 @@
-import UsersDAOV2 from '../../dao/v2/UsersDAO.js'
-import Auth0UserInfo from './auth0.userinfo.js'
+import UsersDAOV2 from '../../../dao/v2/UsersDAO.js'
+import Auth0UserInfo from '../auth0.userinfo.js'
 
 export default class UsersControllerV2 {
     static async apiGetUsers(req, res) {

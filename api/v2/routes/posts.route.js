@@ -1,5 +1,5 @@
 import express from "express"
-import PostsControllerV2 from "./posts.controller.js"
+import PostsControllerV2 from "../controllers/posts.controller.js"
 import multer from "multer"
 
 // Image Upload

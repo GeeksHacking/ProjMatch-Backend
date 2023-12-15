@@ -22,7 +22,8 @@ Post Object
     "rating": 0.0,
     "tags": [],
     "technologies": [],
-    "algoData": [] // Unused as of 31/7/23
+    "algoData": [] // Unused as of 31/7/23,
+    "addedUsers": []
 }
 */
 
