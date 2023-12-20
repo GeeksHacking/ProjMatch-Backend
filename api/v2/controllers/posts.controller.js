@@ -116,7 +116,6 @@ export default class PostsControllerV2 {
 
             res.status(200).json({ status: "success", insertProjectWithID: postsResponse.insertedId })
         } catch (err) {
-            console.log(err)
             res.status(err.statusCode ? err.statusCode : 500).json({ error: err.msg ? err.msg : err.message })
         }
     }

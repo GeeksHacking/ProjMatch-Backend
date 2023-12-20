@@ -22,7 +22,7 @@ export default class AuthTokenController {
                     audience: process.env.AUTH0_AUDIENCE,
                     code: accessToken,
                     scope: "openid email profile",
-                    redirect_uri: `http://localhost:3000/Load`,
+                    redirect_uri: `${process.env.AUTH0_BASE_URL}/Load`,
                 }),
             };
 
