@@ -1,4 +1,4 @@
-import PostsDAOV2 from "../dao/v2/PostsDAO"
+import PostsDAOV2 from "../dao/v2/PostsDAO.js"
 
 // Check if addedUsers exist in the post object, if not, add it. If yes, return post
 export default async function UpdateToNewPostSchema(post) {

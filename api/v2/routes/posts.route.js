@@ -1,5 +1,6 @@
 import express from "express"
 import PostsControllerV2 from "../controllers/posts.controller.js"
+import UpdatePostMemberController from "../controllers/updatepostmembers.controller.js"
 import multer from "multer"
 
 // Image Upload
@@ -21,6 +22,11 @@ router.route("/")
     .post(upload.array("images"), PostsControllerV2.apiPostPosts)
     .delete(PostsControllerV2.apiDeletePosts)
     .put(upload.array("images"), PostsControllerV2.apiPutPosts)
+
+// Support for Adding and Removing Authorised users from the post
+router.route("/updateuser")
+    .post(UpdatePostMemberController.apiAddUser)
+    .delete(UpdatePostMemberController.apiRemoveUser)
 
 router.use((error, req, res, next) => {
     if (error instanceof multer.MulterError) {

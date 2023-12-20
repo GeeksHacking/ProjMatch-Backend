@@ -1,6 +1,6 @@
 import ImagesDAO from "../../../dao/ImagesDAO.js"
 import PostsDAOV2 from "../../../dao/v2/PostsDAO.js"
-import Auth0UserInfo from "../auth0.userinfo.js"
+import Auth0UserInfo from "../../../helper/auth0.userinfo.js"
 import UpdateToNewPostSchema from "../../../helper/UpdatePosts.js"
 
 export default class PostsControllerV2 {
@@ -48,7 +48,6 @@ export default class PostsControllerV2 {
 
     static async apiPostPosts(req, res) {
         const bearerToken = req.headers["authorization"].split(" ")[1]
-
         try {
             const images = req.images
             const projectName = req.body.projectName
@@ -59,9 +58,9 @@ export default class PostsControllerV2 {
             const technologies = req.body.technologies
 
             // Check for missing parameters
-            if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined || images === undefined || contact === undefined) {
-                throw new Error("One or more required fields returned undefined. Refer to documentation to see required fields")
-            }
+            // if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined || images === undefined || contact === undefined) {
+            //     throw new Error("One or more required fields returned undefined. Refer to documentation to see required fields")
+            // }
 
             // Verify User's Identity
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
@@ -112,6 +111,7 @@ export default class PostsControllerV2 {
 
             res.status(200).json({ status: "success", insertProjectWithID: postsResponse.insertedId })
         } catch (err) {
+            console.log(err)
             res.status(err.statusCode ? err.statusCode : 500).json({ error: err.msg ? err.msg : err.message })
         }
     }
