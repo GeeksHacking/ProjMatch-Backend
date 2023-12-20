@@ -2,6 +2,7 @@ import ImagesDAO from "../../../dao/ImagesDAO.js"
 import PostsDAOV2 from "../../../dao/v2/PostsDAO.js"
 import Auth0UserInfo from "../../../helper/auth0.userinfo.js"
 import UpdateToNewPostSchema from "../../../helper/UpdatePosts.js"
+import UsersControllerV2 from "./users.controller.js"
 
 export default class PostsControllerV2 {
     static async apiGetPosts(req, res) {
@@ -58,15 +59,19 @@ export default class PostsControllerV2 {
             const technologies = req.body.technologies
 
             // Check for missing parameters
-            // if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined || images === undefined || contact === undefined) {
-            //     throw new Error("One or more required fields returned undefined. Refer to documentation to see required fields")
-            // }
+            if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined || images === undefined || contact === undefined) {
+                throw new Error("One or more required fields returned undefined. Refer to documentation to see required fields")
+            }
 
             // Verify User's Identity
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            if (contact !== userInfoFromAuth0.data.email) {
+            const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
+            const { usersList, totalUsers } = await UsersControllerV2.apiGetUsers({ userID: creatorUserID }, 0, 1)
+            const pmUser = usersList[0]
+            
+            if (pmUser.auth0UserID !== auth0UserID) {
                 throw {
-                    "msg": "User is not authorised to make a post under given user ID.",
+                    "msg": `User with User ID: ${creatorUserID} has no permission to remove users to post.`,
                     "statusCode": 401
                 }
             }
@@ -141,9 +146,13 @@ export default class PostsControllerV2 {
                 }
             }
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            if (postsList[0].contact !== userInfoFromAuth0.data.email) {
+            const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
+            const { usersList, totalUsers } = await UsersControllerV2.apiGetUsers({ userID: postsList[0].creatorUserID }, 0, 1)
+            const pmUser = usersList[0]
+            
+            if (pmUser.auth0UserID !== auth0UserID) {
                 throw {
-                    "msg": "User not authorized to update post",
+                    "msg": `User with User ID: ${postsList[0].creatorUserID} has no permission to remove users to post.`,
                     "statusCode": 401
                 }
             }
@@ -189,9 +198,13 @@ export default class PostsControllerV2 {
             }
             const deletedProjImages = postsList[0].images
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            if (postsList[0].contact !== userInfoFromAuth0.data.email) {
+            const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
+            const { usersList, totalUsers } = await UsersControllerV2.apiGetUsers({ userID: postsList[0].creatorUserID }, 0, 1)
+            const pmUser = usersList[0]
+            
+            if (pmUser.auth0UserID !== auth0UserID) {
                 throw {
-                    "msg": "User not authorized to delete post",
+                    "msg": `User with User ID: ${postsList[0].creatorUserID} has no permission to remove users to post.`,
                     "statusCode": 401
                 }
             }
