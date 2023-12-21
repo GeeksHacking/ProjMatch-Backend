@@ -85,13 +85,13 @@ export default class UsersDAOV2 {
         }
     }
 
-    static async postUser(username, contact, about, algoData, skills) {
+    static async postUser(username, contact, about, algoData, skills, auth0UserID) {
         // Create a new User in the ProjMatch MongoDB
         try {
 
             // User Structure
-            const UserStruct = new makeStruct(["username", "about", "profileImg", "bannerImg", "contact", "rating", "technologies", "savedPosts", "algoData"])
-            const userDoc = new UserStruct(username, about, "", "", contact, 0.0, skills, [], algoData)
+            const UserStruct = new makeStruct(["username", "about", "profileImg", "bannerImg", "contact", "rating", "technologies", "savedPosts", "algoData", "auth0UserID"])
+            const userDoc = new UserStruct(username, about, "", "", contact, 0.0, skills, [], algoData, auth0UserID)
 
             const response = await users.insertOne(userDoc)
 

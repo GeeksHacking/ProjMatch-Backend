@@ -8,8 +8,8 @@ import images from "./api/v1/images.route.js"
 import posts from "./api/v1/posts.route.js"
 import authToken from "./api/v1/authtoken.route.js"
 
-import usersv2 from "./api/v2/users.route.js"
-import postsv2 from "./api/v2/posts.route.js"
+import usersv2 from "./api/v2/routes/users.route.js"
+import postsv2 from "./api/v2/routes/posts.route.js"
 
 dotenv.config()
 
@@ -42,7 +42,7 @@ app.use("/api/v1/authtoken", authToken)
 
 // V2 API
 app.use("/api/v2/users", jwtCheck, usersv2)
-app.use("/api/v2/posts", postsv2)
+app.use("/api/v2/posts", jwtCheck, postsv2)
 
 // Default
 app.use("*", (req, res) => res.status(404).json({error: "Not Found"}))

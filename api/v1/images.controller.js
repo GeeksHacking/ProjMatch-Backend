@@ -69,7 +69,7 @@ export default class ImagesController {
                 imageURL.push(reviewResponse[i].Location)
             }
 
-            if (imageURL === []) {
+            if (imageURL.length === 0) {
                 throw new Error("Unable to save any images.")
             }
 
@@ -100,7 +100,7 @@ export default class ImagesController {
                 folderName = createHash("sha256").update(`${projectName} | ${creatorUserID}`).digest("hex")
             }
 
-            if (imageName === undefined || imageName === []) {
+            if (imageName === undefined || imageName.length === 0) {
                 throw new Error("imageName is undefined or contains no elements")
             }
 

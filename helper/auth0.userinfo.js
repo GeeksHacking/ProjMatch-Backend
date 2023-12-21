@@ -12,7 +12,6 @@ export default class Auth0UserInfo {
         }
 
         const response = await axios.request(apiOptions)
-
         return response
     }
 }

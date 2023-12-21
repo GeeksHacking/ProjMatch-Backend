@@ -1,5 +1,6 @@
-import UsersDAOV2 from '../../dao/v2/UsersDAO.js'
-import Auth0UserInfo from './auth0.userinfo.js'
+import UsersDAOV2 from '../../../dao/v2/UsersDAO.js'
+import Auth0UserInfo from '../../../helper/auth0.userinfo.js'
+import mongodb from "mongodb"
 
 export default class UsersControllerV2 {
     static async apiGetUsers(req, res) {
@@ -39,6 +40,7 @@ export default class UsersControllerV2 {
                     delete temp.savedPosts
                     delete temp.algoData
                     delete temp.technologies
+                    delete temp.auth0UserID
                     newUsersList.push(temp)
                 } else {
                     newUsersList.push(usersList[i])
@@ -87,7 +89,7 @@ export default class UsersControllerV2 {
                 }
             }
 
-            // Check if the User already exists
+            /*// Check if the User already exists
             const getUserFilters = { "username": username }
             const { resUserList, resTotalUsers } = await UsersDAOV2.getUser({ getUserFilters, page, usersPerPage })
             if (resTotalUsers !== 0) {
@@ -96,10 +98,11 @@ export default class UsersControllerV2 {
                     "msg": "User already exists! Cannot create user.",
                     "statusCode": 400
                 }
-            }
+            }*/
 
-            // User does not exist, so can create user
-            const response = await UsersDAOV2.postUser(username, contact, about, algoData, skills)
+            // Create user
+            const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
+            const response = await UsersDAOV2.postUser(username, contact, about, algoData, skills, auth0UserID)
 
             if (response.status === "failure") {
                 return {
@@ -109,9 +112,9 @@ export default class UsersControllerV2 {
             }
 
             res.status(200).json(response)
-
         } catch (err) {
-            res.status(err.statusCode).json({ error: err.msg })
+            console.log(err)
+            res.status(err.statusCode ? 500 : err.statusCode).json({ error: err.msg })
         }
     }
 
