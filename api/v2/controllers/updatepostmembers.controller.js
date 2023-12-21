@@ -1,7 +1,6 @@
 import UpdateMembersDAO from "../../../dao/v2/UpdateMembersDAO.js"
 import Auth0UserInfo from "../../../helper/auth0.userinfo.js"
-import UsersControllerV2 from "./users.controller.js"
-
+import UsersDAOV2 from "../../../dao/v2/UsersDAO.js"
 export default class UpdatePostMemberController {
     static async apiAddUser(req, res) {
         const bearerToken = req.headers["authorization"].split(" ")[1]
@@ -21,7 +20,7 @@ export default class UpdatePostMemberController {
             // Check for Authorisation
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
-            const { usersList, totalUsers } = await UsersControllerV2.apiGetUsers({ userID: ownerUserID }, 0, 1)
+            const { usersList, totalUsers } = await UsersDAOV2.apiGetUsers({ userID: ownerUserID }, 0, 1)
             const pmUser = usersList[0]
             
             if (pmUser.auth0UserID !== auth0UserID) {
@@ -58,7 +57,7 @@ export default class UpdatePostMemberController {
             // Check for Authorisation
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
-            const { usersList, totalUsers } = await UsersControllerV2.apiGetUsers({ userID: ownerUserID }, 0, 1)
+            const { usersList, totalUsers } = await UsersDAOV2.apiGetUsers({ userID: ownerUserID }, 0, 1)
             const pmUser = usersList[0]
             
             if (pmUser.auth0UserID !== auth0UserID) {
