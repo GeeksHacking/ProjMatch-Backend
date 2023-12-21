@@ -2,7 +2,7 @@ import ImagesDAO from "../../../dao/ImagesDAO.js"
 import PostsDAOV2 from "../../../dao/v2/PostsDAO.js"
 import Auth0UserInfo from "../../../helper/auth0.userinfo.js"
 import UpdateToNewPostSchema from "../../../helper/UpdatePosts.js"
-import UsersControllerV2 from "./users.controller.js"
+import UsersDAOV2 from "../../../dao/v2/UsersDAO.js"
 
 export default class PostsControllerV2 {
     static async apiGetPosts(req, res) {
@@ -28,8 +28,8 @@ export default class PostsControllerV2 {
 
             const updatedPostList = []
             for (let i = 0; i < postsList.length; i++) {
-                const updatedPost = UpdateToNewPostSchema(postsList[i])
-                
+                const updatedPost = await UpdateToNewPostSchema(postsList[i])
+                console.log(updatedPost) 
                 updatedPostList.push(updatedPost !== null ? updatedPost : postsList[i])
             }
 
@@ -57,21 +57,30 @@ export default class PostsControllerV2 {
             const contact = req.body.contact
             const tags = req.body.tags
             const technologies = req.body.technologies
+		console.log(req)
+	    console.log( projectName)
+            console.log( description)
+            console.log( creatorUserID)
+            console.log( contact)
+            console.log( tags)
+            console.log( technologies)
+            console.log( images)
+
 
             // Check for missing parameters
-            if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined || images === undefined || contact === undefined) {
+            if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined  || contact === undefined) {
                 throw new Error("One or more required fields returned undefined. Refer to documentation to see required fields")
             }
+		console.log("here")
 
             // Verify User's Identity
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
-            const { usersList, totalUsers } = await UsersControllerV2.apiGetUsers({ userID: creatorUserID }, 0, 1)
+            const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: creatorUserID }, 0, 1)
             const pmUser = usersList[0]
-            
             if (pmUser.auth0UserID !== auth0UserID) {
                 throw {
-                    "msg": `User with User ID: ${creatorUserID} has no permission to remove users to post.`,
+                    "msg": `User with User ID: ${creatorUserID} has no permission to make users to post.`,
                     "statusCode": 401
                 }
             }
@@ -84,17 +93,18 @@ export default class PostsControllerV2 {
 
             /// Call ImagesDAO to add to S3
             const imagesResponse = await ImagesDAO.addImages(type, projectName, creatorUserID, images)
-
+		console.log(imagesResponse)
             if (imagesResponse.status === "failure") {
                 throw {
                     "msg": `Failed to save images to S3 with Error: ${imagesResponse.msg}`,
                     "statusCode": 500
                 }
             }
-
+	    
             let imageURLs = []
             for (let i = 0; i < imagesResponse.response.length; i++) {
                 imageURLs.push(imagesResponse.response[i].Location)
+		console.log(imageURLs)
             }
 
             if (imageURLs.length === 0) {
@@ -113,6 +123,7 @@ export default class PostsControllerV2 {
                     "statusCode": 500
                 }
             }
+		console.log(postsResponse)
 
             res.status(200).json({ status: "success", insertProjectWithID: postsResponse.insertedId })
         } catch (err) {

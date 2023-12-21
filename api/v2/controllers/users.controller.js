@@ -22,7 +22,7 @@ export default class UsersControllerV2 {
                     }
                 }
 
-                filters.userID = req.query.userID
+                filters.id = req.query.userID
             }
 
             // Get the usersList and totalUsers from UsersDAOV2
@@ -56,6 +56,7 @@ export default class UsersControllerV2 {
                 usersPerPage: usersPerPage
             }
 
+		console.log(response)
             // Send JSON Response
             res.status(200).json(response)
         } catch (err) {

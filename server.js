@@ -38,11 +38,12 @@ app.use(express.json())
 app.use("/api/v1/users", jwtCheck, users)
 app.use("/api/v1/images", jwtCheck, images)
 app.use("/api/v1/posts", jwtCheck, posts)
-app.use("/api/v1/authtoken", authToken)
+//app.use("/api/v1/authtoken", authToken)
 
 // V2 API
 app.use("/api/v2/users", jwtCheck, usersv2)
 app.use("/api/v2/posts", jwtCheck, postsv2)
+app.use("/api/v2/authtoken", authToken)
 
 // Default
 app.use("*", (req, res) => res.status(404).json({error: "Not Found"}))
