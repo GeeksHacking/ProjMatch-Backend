@@ -28,7 +28,7 @@ export default class PostsControllerV2 {
 
             const updatedPostList = []
             for (let i = 0; i < postsList.length; i++) {
-                const updatedPost = UpdateToNewPostSchema(postsList[i])
+                const updatedPost = await UpdateToNewPostSchema(postsList[i])
                 
                 updatedPostList.push(updatedPost !== null ? updatedPost : postsList[i])
             }
