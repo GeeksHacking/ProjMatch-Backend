@@ -65,7 +65,7 @@ export default class PostsControllerV2 {
 
             // Verify User's Identity
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
+            const auth0UserID = userInfoFromAuth0.data.sub.match("(?:\||^)(\d+)$")
             const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
@@ -105,7 +105,8 @@ export default class PostsControllerV2 {
             }
 
             // Create Post with PostsDAOV2 POST Posts
-            const postsResponse = await PostsDAOV2.postPosts(projectName, description, creatorUserID, contact, 0.0, tags, technologies, imageURLs)
+            const rating = [0.0, 0]
+            const postsResponse = await PostsDAOV2.postPosts(projectName, description, creatorUserID, contact, rating, tags, technologies, imageURLs)
 
             if (postsResponse.status === "failure") {
                 throw {
@@ -145,7 +146,7 @@ export default class PostsControllerV2 {
                 }
             }
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
+            const auth0UserID = userInfoFromAuth0.data.sub.match("(?:\||^)(\d+)$")
             const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: postsList[0].creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
@@ -197,7 +198,7 @@ export default class PostsControllerV2 {
             }
             const deletedProjImages = postsList[0].images
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
+            const auth0UserID = userInfoFromAuth0.data.sub.match("(?:\||^)(\d+)$")
             const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: postsList[0].creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
