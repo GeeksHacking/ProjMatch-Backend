@@ -66,7 +66,7 @@ export default class PostsControllerV2 {
             // Verify User's Identity
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
-            const { usersList, totalUsers } = await UsersDAOV2.apiGetUsers({ userID: creatorUserID }, 0, 1)
+            const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
             if (pmUser.auth0UserID !== auth0UserID) {
@@ -146,7 +146,7 @@ export default class PostsControllerV2 {
             }
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
-            const { usersList, totalUsers } = await UsersDAOV2.apiGetUsers({ userID: postsList[0].creatorUserID }, 0, 1)
+            const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: postsList[0].creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
             if (pmUser.auth0UserID !== auth0UserID) {
@@ -198,7 +198,7 @@ export default class PostsControllerV2 {
             const deletedProjImages = postsList[0].images
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
-            const { usersList, totalUsers } = await UsersDAOV2.apiGetUsers({ userID: postsList[0].creatorUserID }, 0, 1)
+            const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: postsList[0].creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
             if (pmUser.auth0UserID !== auth0UserID) {
