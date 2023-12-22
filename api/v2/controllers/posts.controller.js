@@ -1,8 +1,8 @@
 import ImagesDAO from "../../../dao/ImagesDAO.js"
 import PostsDAOV2 from "../../../dao/v2/PostsDAO.js"
+import UsersDAOV2 from "../../../dao/v2/UsersDAO.js"
 import Auth0UserInfo from "../../../helper/auth0.userinfo.js"
 import UpdateToNewPostSchema from "../../../helper/UpdatePosts.js"
-import UsersControllerV2 from "./users.controller.js"
 
 export default class PostsControllerV2 {
     static async apiGetPosts(req, res) {
@@ -28,7 +28,7 @@ export default class PostsControllerV2 {
 
             const updatedPostList = []
             for (let i = 0; i < postsList.length; i++) {
-                const updatedPost = UpdateToNewPostSchema(postsList[i])
+                const updatedPost = await UpdateToNewPostSchema(postsList[i])
                 
                 updatedPostList.push(updatedPost !== null ? updatedPost : postsList[i])
             }
@@ -50,7 +50,7 @@ export default class PostsControllerV2 {
     static async apiPostPosts(req, res) {
         const bearerToken = req.headers["authorization"].split(" ")[1]
         try {
-            const images = req.images
+            const images = req.files
             const projectName = req.body.projectName
             const description = req.body.description
             const creatorUserID = req.body.creatorUserID
@@ -66,7 +66,7 @@ export default class PostsControllerV2 {
             // Verify User's Identity
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
-            const { usersList, totalUsers } = await UsersControllerV2.apiGetUsers({ userID: creatorUserID }, 0, 1)
+            const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
             if (pmUser.auth0UserID !== auth0UserID) {
@@ -105,7 +105,7 @@ export default class PostsControllerV2 {
             }
 
             // Create Post with PostsDAOV2 POST Posts
-            const postsResponse = await PostsDAOV2.postPosts(projectName, description, creatorUserID, contact, 0.0, tags, technologies, images)
+            const postsResponse = await PostsDAOV2.postPosts(projectName, description, creatorUserID, contact, 0.0, tags, technologies, imageURLs)
 
             if (postsResponse.status === "failure") {
                 throw {
@@ -146,7 +146,7 @@ export default class PostsControllerV2 {
             }
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
-            const { usersList, totalUsers } = await UsersControllerV2.apiGetUsers({ userID: postsList[0].creatorUserID }, 0, 1)
+            const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: postsList[0].creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
             if (pmUser.auth0UserID !== auth0UserID) {
@@ -198,12 +198,12 @@ export default class PostsControllerV2 {
             const deletedProjImages = postsList[0].images
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
-            const { usersList, totalUsers } = await UsersControllerV2.apiGetUsers({ userID: postsList[0].creatorUserID }, 0, 1)
+            const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: postsList[0].creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
             if (pmUser.auth0UserID !== auth0UserID) {
                 throw {
-                    "msg": `User with User ID: ${postsList[0].creatorUserID} has no permission to remove users to post.`,
+                    "msg": `User with User ID: ${postsList[0].creatorUserID} has no permission the post.`,
                     "statusCode": 401
                 }
             }

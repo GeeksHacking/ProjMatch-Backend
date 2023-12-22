@@ -4,7 +4,7 @@ import PostsDAOV2 from "../dao/v2/PostsDAO.js"
 export default async function UpdateToNewPostSchema(post) {
     if (!post.hasOwnProperty("addedUsers")) {
         post.addedUsers = [post.creatorUserID]
-        PostsDAOV2.putPosts(post._id, post)
+        await PostsDAOV2.putPosts(post._id, post)
 
         return post
     }
