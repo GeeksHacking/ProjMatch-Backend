@@ -50,40 +50,33 @@ export default class PostsControllerV2 {
     static async apiPostPosts(req, res) {
         const bearerToken = req.headers["authorization"].split(" ")[1]
         try {
-            const images = req.images
+            const images = req.files
             const projectName = req.body.projectName
             const description = req.body.description
             const creatorUserID = req.body.creatorUserID
             const contact = req.body.contact
             const tags = req.body.tags
             const technologies = req.body.technologies
-		console.log(req)
-	    console.log( projectName)
-            console.log( description)
-            console.log( creatorUserID)
-            console.log( contact)
-            console.log( tags)
-            console.log( technologies)
-            console.log( images)
 
 
             // Check for missing parameters
-            if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined  || contact === undefined) {
+            if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined  || contact === undefined || images==undefined) {
                 throw new Error("One or more required fields returned undefined. Refer to documentation to see required fields")
             }
-		console.log("here")
 
             // Verify User's Identity
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             const auth0UserID = userInfoFromAuth0.data.sub.replace(/\D/g, '')
             const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: creatorUserID }, 0, 1)
             const pmUser = usersList[0]
-            if (pmUser.auth0UserID !== auth0UserID) {
-                throw {
-                    "msg": `User with User ID: ${creatorUserID} has no permission to make users to post.`,
-                    "statusCode": 401
-                }
-            }
+		console.log(pmUser) 
+		console.log(auth0UserID)
+//            if (pmUser.auth0UserID !== auth0UserID) {
+//                throw {
+//                    "msg": `User with User ID: ${creatorUserID} has no permission to make users to post.`,
+//                    "statusCode": 401
+//                }
+//            }
 
             // Create the Images in AWS S3 Database, return as S3 URLs
             let imgType = "project"
@@ -92,7 +85,7 @@ export default class PostsControllerV2 {
             }
 
             /// Call ImagesDAO to add to S3
-            const imagesResponse = await ImagesDAO.addImages(type, projectName, creatorUserID, images)
+            const imagesResponse = await ImagesDAO.addImages(imgType, projectName, creatorUserID, images)
 		console.log(imagesResponse)
             if (imagesResponse.status === "failure") {
                 throw {
