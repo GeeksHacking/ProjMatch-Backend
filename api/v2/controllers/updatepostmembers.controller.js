@@ -19,8 +19,13 @@ export default class UpdatePostMemberController {
 
             // Check for Authorisation
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            const auth0UserID = userInfoFromAuth0.data.sub.match("(?:\||^)(\d+)$")
-            const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: ownerUserID }, 0, 1)
+            const auth0UserID = userInfoFromAuth0.data.sub.match(/(\d+)$/g)
+            const filter = { userID: ownerUserID }
+            const { usersList, totalUsers } = await UsersDAOV2.getUser({
+                filters: filter,
+                page: 0,
+                usersPerPage: 1
+            })
             const pmUser = usersList[0]
             
             if (pmUser.auth0UserID !== auth0UserID) {
@@ -56,7 +61,7 @@ export default class UpdatePostMemberController {
             
             // Check for Authorisation
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            const auth0UserID = userInfoFromAuth0.data.sub.match("(?:\||^)(\d+)$")
+            const auth0UserID = userInfoFromAuth0.data.sub.match(/(\d+)$/g)
             const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: ownerUserID }, 0, 1)
             const pmUser = usersList[0]
             

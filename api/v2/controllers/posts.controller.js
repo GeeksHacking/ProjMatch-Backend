@@ -3,6 +3,7 @@ import PostsDAOV2 from "../../../dao/v2/PostsDAO.js"
 import UsersDAOV2 from "../../../dao/v2/UsersDAO.js"
 import Auth0UserInfo from "../../../helper/auth0.userinfo.js"
 import UpdateToNewPostSchema from "../../../helper/UpdatePosts.js"
+import mongodb from 'mongodb'
 
 export default class PostsControllerV2 {
     static async apiGetPosts(req, res) {
@@ -55,8 +56,8 @@ export default class PostsControllerV2 {
             const description = req.body.description
             const creatorUserID = req.body.creatorUserID
             const contact = req.body.contact
-            const tags = req.body.tags
-            const technologies = req.body.technologies
+            const tags = req.body.tags.split(",")
+            const technologies = req.body.technologies.split(",")
 
             // Check for missing parameters
             if (projectName === undefined || description === undefined || creatorUserID === undefined || tags === undefined || technologies === undefined || images === undefined || contact === undefined) {
@@ -65,7 +66,7 @@ export default class PostsControllerV2 {
 
             // Verify User's Identity
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            const auth0UserID = userInfoFromAuth0.data.sub.match("(?:\||^)(\d+)$")
+            const auth0UserID = userInfoFromAuth0.data.sub.match(/(\d+)$/g)
             const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
@@ -83,7 +84,7 @@ export default class PostsControllerV2 {
             }
 
             /// Call ImagesDAO to add to S3
-            const imagesResponse = await ImagesDAO.addImages(type, projectName, creatorUserID, images)
+            const imagesResponse = await ImagesDAO.addImages(imgType, projectName, creatorUserID, images)
 
             if (imagesResponse.status === "failure") {
                 throw {
@@ -115,7 +116,7 @@ export default class PostsControllerV2 {
                 }
             }
 
-            res.status(200).json({ status: "success", insertProjectWithID: postsResponse.insertedId })
+            res.status(200).json({ status: "success", insertedProjectWithID: new mongodb.ObjectId(postsResponse.response.insertedId).toString() })
         } catch (err) {
             res.status(err.statusCode ? err.statusCode : 500).json({ error: err.msg ? err.msg : err.message })
         }
@@ -146,7 +147,7 @@ export default class PostsControllerV2 {
                 }
             }
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            const auth0UserID = userInfoFromAuth0.data.sub.match("(?:\||^)(\d+)$")
+            const auth0UserID = userInfoFromAuth0.data.sub.match(/(\d+)$/g)
             const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: postsList[0].creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
@@ -198,7 +199,7 @@ export default class PostsControllerV2 {
             }
             const deletedProjImages = postsList[0].images
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
-            const auth0UserID = userInfoFromAuth0.data.sub.match("(?:\||^)(\d+)$")
+            const auth0UserID = userInfoFromAuth0.data.sub.match(/(\d+)$/g)
             const { usersList, totalUsers } = await UsersDAOV2.getUser({ userID: postsList[0].creatorUserID }, 0, 1)
             const pmUser = usersList[0]
             
