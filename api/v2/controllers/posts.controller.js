@@ -50,7 +50,7 @@ export default class PostsControllerV2 {
     static async apiPostPosts(req, res) {
         const bearerToken = req.headers["authorization"].split(" ")[1]
         try {
-            const images = req.images
+            const images = req.files
             const projectName = req.body.projectName
             const description = req.body.description
             const creatorUserID = req.body.creatorUserID
@@ -105,7 +105,7 @@ export default class PostsControllerV2 {
             }
 
             // Create Post with PostsDAOV2 POST Posts
-            const postsResponse = await PostsDAOV2.postPosts(projectName, description, creatorUserID, contact, 0.0, tags, technologies, images)
+            const postsResponse = await PostsDAOV2.postPosts(projectName, description, creatorUserID, contact, 0.0, tags, technologies, imageURLs)
 
             if (postsResponse.status === "failure") {
                 throw {
@@ -203,7 +203,7 @@ export default class PostsControllerV2 {
             
             if (pmUser.auth0UserID !== auth0UserID) {
                 throw {
-                    "msg": `User with User ID: ${postsList[0].creatorUserID} has no permission to remove users to post.`,
+                    "msg": `User with User ID: ${postsList[0].creatorUserID} has no permission the post.`,
                     "statusCode": 401
                 }
             }
