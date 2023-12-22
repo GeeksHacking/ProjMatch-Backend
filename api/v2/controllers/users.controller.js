@@ -101,7 +101,7 @@ export default class UsersControllerV2 {
             }*/
 
             // Create user
-            const auth0UserID = userInfoFromAuth0.data.sub.match("(?:\||^)(\d+)$")
+            const auth0UserID = userInfoFromAuth0.data.sub.match(/(\d+)$/g)
             const response = await UsersDAOV2.postUser(username, contact, about, algoData, skills, auth0UserID)
 
             if (response.status === "failure") {
