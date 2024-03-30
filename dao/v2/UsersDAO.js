@@ -145,4 +145,33 @@ export default class UsersDAOV2 {
             }
         }
     }
+
+    static async userWithPosts(id) {
+        try {
+            let userWithPosts = []
+            await users.aggregate([
+                {
+                    $match: { _id: new ObjectID(id) }
+                },
+                {
+                    $lookup: {
+                        from: "posts",
+                        localField: "_id",
+                        foreignField: "creatorUserID",
+                        as: "posts"
+                    }
+                }
+            ]).forEach((post) => userWithPosts.push(post))
+
+            return {
+                "response": userWithPosts[0].posts,
+                "status": "success"
+            }
+        } catch (err) {
+            return {
+                "response": err,
+                "status": "failure"
+            }
+        }
+    }
 }

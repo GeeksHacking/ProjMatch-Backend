@@ -102,7 +102,7 @@ export default class PostsDAO {
         try {
             const PostStruct = new makeStruct(["projectName", "description", "images", "creatorUserID", "contact", "rating", "tags", "technologies", "algoData"])
             
-            const createdProj = new PostStruct(projectName, description, images, creatorUserID, contact, ratings, tags, technologies, [])
+            const createdProj = new PostStruct(projectName, description, images, new ObjectID(creatorUserID), contact, ratings, tags, technologies, [])
             
             const insertRequest = await posts.insertOne(createdProj)
 
