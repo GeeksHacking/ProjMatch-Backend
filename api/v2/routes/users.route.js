@@ -9,4 +9,7 @@ router.route("/")
     .delete(UsersController.apiDeleteUsers)
     .put(UsersController.apiPutUsers)
 
+router.route("/:id/projects")
+    .get(UsersController.apiGetPostsWithUser)
+
 export default router

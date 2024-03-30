@@ -5,6 +5,7 @@ import mongodb from "mongodb"
 export default class UsersControllerV2 {
     static async apiGetUsers(req, res) {
         try {
+            
             const usersPerPage = req.query.usersPerPage ? parseInt(req.query.usersPerPage, 10) : 100 // Default to showing a maximum of 100 users per page
             const page = req.query.page ? parseInt(req.query.page, 10) : 0 // Default to the first page
 
@@ -113,7 +114,6 @@ export default class UsersControllerV2 {
 
             res.status(200).json(response)
         } catch (err) {
-            console.log(err)
             res.status(err.statusCode ? 500 : err.statusCode).json({ error: err.msg })
         }
     }
@@ -210,6 +210,24 @@ export default class UsersControllerV2 {
                 throw {
                     "msg": `You do not have permission to delete user with ID of ${id}`,
                     "statusCode": 403
+                }
+            }
+        } catch (err) {
+            res.status(err.statusCode).json({ error: err.msg })
+        }
+    }
+
+    static async apiGetPostsWithUser(req, res) {
+        try {
+            const { id } = req.params
+            const response = await UsersDAOV2.userWithPosts(id)
+
+            if (response.status === "success") {
+                res.status(200).json({ status: "success", posts: response.response })
+            } else {
+                throw {
+                    "msg": response.response,
+                    "statusCode": 500
                 }
             }
         } catch (err) {
