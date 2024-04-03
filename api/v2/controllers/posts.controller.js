@@ -2,6 +2,7 @@ import ImagesDAO from "../../../dao/ImagesDAO.js"
 import PostsDAOV2 from "../../../dao/v2/PostsDAO.js"
 import UsersDAOV2 from "../../../dao/v2/UsersDAO.js"
 import Auth0UserInfo from "../../../helper/auth0.userinfo.js"
+import GetAuthToken from "../../../helper/GetAuthToken.js"
 import UpdateToNewPostSchema from "../../../helper/UpdatePosts.js"
 import mongodb from 'mongodb'
 
@@ -49,8 +50,9 @@ export default class PostsControllerV2 {
     }
 
     static async apiPostPosts(req, res) {
-        const bearerToken = req.headers["authorization"].split(" ")[1]
         try {
+            const bearerToken = GetAuthToken(req.headers["authorization"])
+
             const images = req.files
             const projectName = req.body.projectName
             const description = req.body.description
@@ -123,9 +125,9 @@ export default class PostsControllerV2 {
     }
 
     static async apiPutPosts(req, res) {
-        const bearerToken = req.headers["authorization"].split(" ")[1]
-
         try {
+            const bearerToken = GetAuthToken(req.headers["authorization"])
+
             const postID = req.body.id
             const update = req.body.update
 
@@ -175,9 +177,9 @@ export default class PostsControllerV2 {
     }
 
     static async apiDeletePosts(req, res) {
-        const bearerToken = req.headers["authorization"].split(" ")[1]
-
         try {
+            const bearerToken = GetAuthToken(req.headers["authorization"])
+
             const postID = req.body.id
 
             // Check for missing PostID

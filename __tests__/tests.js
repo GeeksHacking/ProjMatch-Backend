@@ -12,7 +12,7 @@ const sampleUser = {
     "username": "Im a TESTTTT",
     "about": "API Testing -- Mock User",
     "contact": "test@test.com",
-    "skills": ["none"],
+    "technologies": ["none"],
     "algoData": []
 }
 
@@ -29,9 +29,9 @@ let sampleProjectUid;
 
 // Test Users
 describe("Testing Users API", () => {
-    describe("POST /api/v1/users", () => {
+    describe("POST /api/v2/users", () => {
         test("Send an unauthenticated request", async () => {
-            const response = await api.post("/api/v1/users")
+            const response = await api.get("/api/v2/users")
             expect(response.statusCode).toBe(401)
         })
     
@@ -40,8 +40,8 @@ describe("Testing Users API", () => {
                 if (accessToken === undefined) {
                     throw new Error("Access token returned undefined")
                 }
-    
-                const response = await api.post("/api/v1/users").set('Authorization', `Bearer ${accessToken}`).send(sampleUser)
+                const response = await api.post("/api/v2/users").set('Authorization', `Bearer ${accessToken}`).send(sampleUser)
+
                 expect(response.statusCode).toBe(200)
                 expect(response.body.addedUserWithUsername).toEqual(sampleUser["username"])
                 expect(response.body.addedUserWithUserID).not.toBeUndefined()
@@ -50,9 +50,9 @@ describe("Testing Users API", () => {
         })
     })
     
-    describe("GET /api/v1/users", () => {
+    describe("GET /api/v2/users", () => {
         test("Send an unauthenticated request", async () => {
-            await api.get("/api/v1/users").expect(401)
+            await api.get("/api/v2/users").expect(401)
         })
     
         describe("Test authenticated requests", () => {
@@ -63,7 +63,7 @@ describe("Testing Users API", () => {
                 }
     
                 try {
-                    const response = await api.get("/api/v1/users").set('Authorization', `Bearer ${accessToken}`).expect('Content-Type', /application\/json/)
+                    const response = await api.get("/api/v2/users").set('Authorization', `Bearer ${accessToken}`).expect('Content-Type', /application\/json/)
                     expect(response.statusCode).toBe(200)
     
                 } catch (e) {
@@ -81,7 +81,7 @@ describe("Testing Users API", () => {
                     throw new Error("Sample User's UID is undefined")
                 }
     
-                const response = await api.get(`/api/v1/users?id=${sampleUserUid}`).set('Authorization', `Bearer ${accessToken}`)
+                const response = await api.get(`/api/v2/users?id=${sampleUserUid}`).set('Authorization', `Bearer ${accessToken}`)
                 expect(response.statusCode).toBe(200)
                 expect(response.body.users[0].contact).toContain(sampleUser["contact"])
                 expect(response.body.users[0]._id).toContain(sampleUserUid)
@@ -97,7 +97,7 @@ describe("Testing Users API", () => {
                     throw new Error("Sample User's UID is undefined")
                 }
     
-                const response = await api.get(`/api/v1/users?email=${sampleUser["contact"]}`).set('Authorization', `Bearer ${accessToken}`)
+                const response = await api.get(`/api/v2/users?email=${sampleUser["contact"]}`).set('Authorization', `Bearer ${accessToken}`)
                 expect(response.statusCode).toBe(200)
                 expect(response.body.users[0]._id).toContain(sampleUserUid)
                 expect(response.body.users[0].contact).toContain(sampleUser["contact"])
@@ -105,7 +105,7 @@ describe("Testing Users API", () => {
         })
     })
     
-    describe("PUT /api/v1/users", () => {
+    describe("PUT /api/v2/users", () => {
         const updateUser = {
             "id": sampleUserUid,
             "update": {
@@ -125,7 +125,7 @@ describe("Testing Users API", () => {
     
             updateUser.id = sampleUserUid
     
-            const response = await api.put(`/api/v1/users`).set('Authorization', `Bearer ${accessToken}`).send(updateUser)
+            const response = await api.put(`/api/v2/users`).set('Authorization', `Bearer ${accessToken}`).send(updateUser)
             expect(response.statusCode).toBe(200)
             expect(response.body.status).toBe("success")
         })
@@ -141,13 +141,13 @@ describe("Testing Users API", () => {
             }
             sampleUser.id = sampleUserUid
     
-            const response = await api.get(`/api/v1/users?id=${sampleUserUid}`).set('Authorization', `Bearer ${accessToken}`)
+            const response = await api.get(`/api/v2/users?id=${sampleUserUid}`).set('Authorization', `Bearer ${accessToken}`)
             expect(response.statusCode).toBe(200)
             expect(response.body.users[0].contact).toEqual(updateUser["update"]["contact"])
         })
     })
     
-    describe("DELETE /api/v1/users", () => {
+    describe("DELETE /api/v2/users", () => {
         test("Send DELETE Request", async () => {
     
             if (accessToken === undefined) {
@@ -162,7 +162,7 @@ describe("Testing Users API", () => {
                 "id": sampleUserUid
             }
     
-            const response = await api.delete(`/api/v1/users`).set('Authorization', `Bearer ${accessToken}`).send(deleteUser)
+            const response = await api.delete(`/api/v2/users`).set('Authorization', `Bearer ${accessToken}`).send(deleteUser)
             expect(response.statusCode).toBe(200)
             expect(response.body.status).toBe("success")
             expect(response.body.deletedUserWithID).toEqual(sampleUserUid)
@@ -178,7 +178,7 @@ describe("Testing Users API", () => {
                 throw new Error("Sample User's UID is undefined")
             }
     
-            const response = await api.get(`/api/v1/users?id=${sampleUserUid}`).set('Authorization', `Bearer ${accessToken}`)
+            const response = await api.get(`/api/v2/users?id=${sampleUserUid}`).set('Authorization', `Bearer ${accessToken}`)
             expect(response.statusCode).toBe(200)
             expect(response.body.totalUsers).toEqual(0)
         })
@@ -187,9 +187,9 @@ describe("Testing Users API", () => {
 
 // Test Posts
 describe("Testing Posts API", () => {
-    describe("POST /api/v1/posts", () => {
+    describe("POST /api/v2/posts", () => {
         test("Send an unauthenticated request", async () => {
-            await api.post("/api/v1/posts").expect(401)
+            await api.post("/api/v2/posts").expect(401)
         })
     
         describe("Test authenticated requests", () => {
@@ -198,7 +198,7 @@ describe("Testing Posts API", () => {
                     throw new Error("Access token returned undefined")
                 }
         
-                const response = await api.post("/api/v1/posts").set('Authorization', `Bearer ${accessToken}`).send(sampleProject)
+                const response = await api.post("/api/v2/posts").set('Authorization', `Bearer ${accessToken}`).send(sampleProject)
                 expect(response.statusCode).toBe(200)
                 expect(response.body.status).toEqual("success")
                 expect(response.body.insertedProjectWithID).not.toBeUndefined()
@@ -207,9 +207,9 @@ describe("Testing Posts API", () => {
         })
     })
     
-    describe("GET /api/v1/posts", () => {
+    describe("GET /api/v2/posts", () => {
         test("Send an unauthenticated request", async () => {
-            await api.get("/api/v1/posts").expect(401)
+            await api.get("/api/v2/posts").expect(401)
         })
     
         describe("Test authenticated requests", () => {
@@ -218,7 +218,7 @@ describe("Testing Posts API", () => {
                     throw new Error("Access token returned undefined")
                 }
     
-                await api.get("/api/v1/posts").set('Authorization', `Bearer ${accessToken}`).expect(200).expect('Content-Type', /application\/json/)
+                await api.get("/api/v2/posts").set('Authorization', `Bearer ${accessToken}`).expect(200).expect('Content-Type', /application\/json/)
             })
     
             test("Filter by Project UID", async () => {
@@ -227,7 +227,7 @@ describe("Testing Posts API", () => {
                     throw new Error("Access token returned undefined")
                 }
     
-                const response = await api.get(`/api/v1/posts?id=${sampleProjectUid}`).set('Authorization', `Bearer ${accessToken}`)
+                const response = await api.get(`/api/v2/posts?id=${sampleProjectUid}`).set('Authorization', `Bearer ${accessToken}`)
                 expect(response.statusCode).toBe(200)
                 expect(response.body.totalPosts).toEqual(1)
                 expect(response.body.posts[0].projectName).toEqual(sampleProject.projectName)
@@ -239,7 +239,7 @@ describe("Testing Posts API", () => {
                     throw new Error("Access token returned undefined")
                 }
     
-                const response = await api.get(`/api/v1/posts?userID=${sampleProject.creatorUserID}`).set('Authorization', `Bearer ${accessToken}`)
+                const response = await api.get(`/api/v2/posts?userID=${sampleProject.creatorUserID}`).set('Authorization', `Bearer ${accessToken}`)
                 expect(response.statusCode).toBe(200)
                 expect(response.body.totalPosts).toEqual(1)
                 expect(response.body.posts[0].projectName).toEqual(sampleProject.projectName)
@@ -251,14 +251,14 @@ describe("Testing Posts API", () => {
                     throw new Error("Access token returned undefined")
                 }
     
-                const response = await api.get(`/api/v1/posts?userID=SOMETOKENTHATNOEXIST`).set('Authorization', `Bearer ${accessToken}`)
+                const response = await api.get(`/api/v2/posts?userID=SOMETOKENTHATNOEXIST`).set('Authorization', `Bearer ${accessToken}`)
                 expect(response.statusCode).toBe(200)
                 expect(response.body.totalPosts).toEqual(0)
             })
         })
     })
     
-    describe("PUT /api/v1/posts", () => {
+    describe("PUT /api/v2/posts", () => {
         const updateProject = {
             "id": sampleProjectUid,
             "update": {
@@ -274,7 +274,7 @@ describe("Testing Posts API", () => {
     
             updateProject.id = sampleProjectUid
     
-            const response = await api.put(`/api/v1/posts`).set('Authorization', `Bearer ${accessToken}`).send(updateProject)
+            const response = await api.put(`/api/v2/posts`).set('Authorization', `Bearer ${accessToken}`).send(updateProject)
             expect(response.statusCode).toBe(200)
             expect(response.body.status).toBe("success")
         })
@@ -291,13 +291,13 @@ describe("Testing Posts API", () => {
     
             updateProject.id = sampleProjectUid
     
-            const response = await api.get(`/api/v1/posts?id=${sampleProjectUid}`).set('Authorization', `Bearer ${accessToken}`)
+            const response = await api.get(`/api/v2/posts?id=${sampleProjectUid}`).set('Authorization', `Bearer ${accessToken}`)
             expect(response.statusCode).toBe(200)
             expect(response.body.posts[0].projectName).toEqual(updateProject["update"]["projectName"])
         })
     })
     
-    describe("DELETE /api/v1/posts", () => {
+    describe("DELETE /api/v2/posts", () => {
         test("Send DELETE Request", async () => {
     
             if (accessToken === undefined) {
@@ -312,7 +312,7 @@ describe("Testing Posts API", () => {
                 "id": sampleProjectUid
             }
     
-            const response = await api.delete(`/api/v1/posts`).set('Authorization', `Bearer ${accessToken}`).send(deleteProject)
+            const response = await api.delete(`/api/v2/posts`).set('Authorization', `Bearer ${accessToken}`).send(deleteProject)
             expect(response.statusCode).toBe(200)
             expect(response.body.status).toBe("success")
             expect(response.body.deletedProjectWithID).toEqual(sampleProjectUid)
@@ -328,7 +328,7 @@ describe("Testing Posts API", () => {
                 throw new Error("Sample User's UID is undefined")
             }
     
-            const response = await api.get(`/api/v1/posts?id=${sampleProjectUid}`).set('Authorization', `Bearer ${accessToken}`)
+            const response = await api.get(`/api/v2/posts?id=${sampleProjectUid}`).set('Authorization', `Bearer ${accessToken}`)
             expect(response.statusCode).toBe(200)
             expect(response.body.totalPosts).toEqual(0)
         })

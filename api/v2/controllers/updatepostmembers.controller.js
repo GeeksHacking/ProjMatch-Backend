@@ -1,11 +1,13 @@
 import UpdateMembersDAO from "../../../dao/v2/UpdateMembersDAO.js"
 import Auth0UserInfo from "../../../helper/auth0.userinfo.js"
 import UsersDAOV2 from "../../../dao/v2/UsersDAO.js"
+import GetAuthToken from "../../../helper/GetAuthToken.js"
+
 export default class UpdatePostMemberController {
     static async apiAddUser(req, res) {
-        const bearerToken = req.headers["authorization"].split(" ")[1]
-        
         try {
+            const bearerToken = GetAuthToken(req.headers["authorization"])
+
             const postID = req.body.postID
             const addUserID = req.body.addUserID
             const ownerUserID = req.body.ownerUserID
@@ -51,9 +53,9 @@ export default class UpdatePostMemberController {
     }
     
     static async apiRemoveUser(req, res) {
-        const bearerToken = req.headers["authorization"].split(" ")[1]
-        
         try {
+            const bearerToken = GetAuthToken(req.headers["authorization"])
+
             const postID = req.body.postID
             let removeUserID = req.body.removeUserID
 

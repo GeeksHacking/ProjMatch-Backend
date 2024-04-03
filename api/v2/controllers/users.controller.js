@@ -1,6 +1,6 @@
 import UsersDAOV2 from '../../../dao/v2/UsersDAO.js'
 import Auth0UserInfo from '../../../helper/auth0.userinfo.js'
-import mongodb from "mongodb"
+import GetAuthToken from '../../../helper/GetAuthToken.js'
 
 export default class UsersControllerV2 {
     static async apiGetUsers(req, res) {
@@ -31,7 +31,7 @@ export default class UsersControllerV2 {
 
             // Sort the data, and only show necessary info
             /// Get user information from Auth0 using /userinfo endpoint
-            const bearerToken = req.headers["authorization"].split(" ")[1]
+            const bearerToken = GetAuthToken(req.headers["authorization"])
             const userInfoFromAuth0 = await Auth0UserInfo.getUserInformationAuth0(bearerToken)
             /// Loop through Users List, remove unnecessary info. If that user is the user requesting for info, all info can be added
             let newUsersList = []
@@ -65,9 +65,9 @@ export default class UsersControllerV2 {
     }
 
     static async apiPostUsers(req, res) {
-        const bearerToken = req.headers["authorization"].split(" ")[1]
-
         try {
+            const bearerToken = GetAuthToken(req.headers["authorization"])
+
             const username = req.body.username
             const contact = req.body.contact
             const about = req.body.about
@@ -119,9 +119,9 @@ export default class UsersControllerV2 {
     }
 
     static async apiPutUsers(req, res) {
-        const bearerToken = req.headers["authorization"].split(" ")[1]
-
         try {
+            const bearerToken = GetAuthToken(req.headers["authorization"])
+
             // Get Data from API Request Body
             const id = req.body.id
             const update = req.body.update
@@ -169,9 +169,9 @@ export default class UsersControllerV2 {
     }
 
     static async apiDeleteUsers(req, res) {
-        const bearerToken = req.headers["authorization"].split(" ")[1]
-
         try {
+            const bearerToken = GetAuthToken(req.headers["authorization"])
+
             const id = req.body.id
 
             if (id === undefined) {

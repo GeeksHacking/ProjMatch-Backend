@@ -35,9 +35,8 @@ app.use(cors(corsOptionsDelegate))
 app.use(express.json())
 
 // V2 API
-// app.use("/api/v2/users", jwtCheck, usersv2)
 app.use("/api/v2/posts", jwtCheck, postsv2)
-app.use("/api/v2/users", usersv2)
+app.use("/api/v2/users", jwtCheck, usersv2)
 app.use("/api/v2/authtoken", authToken)
 
 // Default
